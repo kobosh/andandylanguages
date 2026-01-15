@@ -1,21 +1,16 @@
 package com.nubianlanguages.authservice.controller;
 
-import com.nubianlanguages.authservice.dto.AuthResponse;
 import com.nubianlanguages.authservice.dto.LoginRequest;
 import com.nubianlanguages.authservice.dto.RegisterRequest;
 import com.nubianlanguages.authservice.model.AppUser;
+import com.nubianlanguages.authservice.repository.UserRepository;
 import com.nubianlanguages.authservice.security.JwtService;
-import com.nubianlanguages.authservice.service.AuthServiceDel;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.nubianlanguages.authservice.repository.UserRepository;
-
-
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 @RestController

@@ -1,14 +1,12 @@
 package com.nubianlanguages.audioservices.health;
 
 
-import com.nubianlanguages.audioservices.service.StorageService;
 import io.minio.BucketExistsArgs;
+import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
-import io.minio.MinioClient;
-import java.time.Instant;
 
 @Component
 public class StorageHealthIndicator implements HealthIndicator {
