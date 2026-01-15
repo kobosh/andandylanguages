@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  auth-service:
+    build: .
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped

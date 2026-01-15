@@ -1,0 +1,16 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:h2:file:\data\authdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  h2:
+    console:
+      enabled: true
+jwt:
+  secret: XcYrNNwJ0SbxazMJT2HkCDaNg9yqAPqBtCTRtbeyM2o=
+
