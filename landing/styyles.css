@@ -1,0 +1,135 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    color: #222;
+    background: #fafafa;
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 2rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.logo {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+nav a {
+    margin-left: 1.2rem;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+nav a.cta {
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    background: #2e7d32;
+    color: white;
+}
+
+/* Hero */
+.hero {
+    padding: 4rem 2rem;
+    text-align: center;
+    background: linear-gradient(to bottom, #f5f5f5, #ffffff);
+}
+
+.hero h1 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    max-width: 640px;
+    margin: 0 auto 2rem;
+    color: #555;
+}
+
+.hero-actions .btn {
+    margin: 0 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.6rem;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.btn.primary {
+    background: #2e7d32;
+    color: white;
+}
+
+.btn.secondary {
+    border: 2px solid #2e7d32;
+    color: #2e7d32;
+}
+
+/* Sections */
+.section {
+    padding: 3rem 2rem;
+    max-width: 900px;
+    margin: auto;
+}
+
+.section.alt {
+    background: #f0f0f0;
+}
+
+.section h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Steps */
+.steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.step {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 6px;
+}
+
+/* Values */
+.values {
+    list-style: none;
+    max-width: 500px;
+    margin: auto;
+}
+
+.values li {
+    margin: 0.6rem 0;
+}
+
+/* Footer */
+footer {
+    padding: 2rem;
+    text-align: center;
+    background: #222;
+    color: #ccc;
+}
+
+footer a {
+    color: #9ccc65;
+    text-decoration: none;
+}
