@@ -64,10 +64,9 @@ public class AuthController {
         // 3️⃣ Create user
         AppUser user = new AppUser();
         user.setEmail(request.getEmail());
-
         // ⚠️ Plain text for now (OK for dev, NOT prod)
         user.setPassword(request.getPassword());
-
+        //user.setPassword(passwordEncoder.encode(request.getPassword()));
         // OPTIONAL: only set name if it exists
 //        if (request.getName() != null) {
 //            user.setName(request.getName());

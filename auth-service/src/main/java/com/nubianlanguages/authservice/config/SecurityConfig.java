@@ -2,6 +2,7 @@ package com.nubianlanguages.authservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,6 +18,7 @@ public class SecurityConfig {
         http
                 // 🔴 FORCE this chain to apply to ALL requests
                 .securityMatcher("/**")
+                .cors(Customizer.withDefaults())
 
                 // 🔴 CSRF MUST be disabled for POST APIs
                 .csrf(csrf -> csrf.disable())
