@@ -44,37 +44,3 @@ public class JwtService {
     }
 }
 
-
-/*@Service
-public class JwtService {
-
-    @Value("${jwt.secret}")
-    private String secret;
-
-    private Key getSignInKey() {
-        System.out.println("in jwts.getSignInKey");
-        // Secret MUST be Base64 encoded
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);    }
-
-    public String generateToken(String email) {
-        System.out.println("in Jwtservice.generateToken");
-        return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(
-                        new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24) // 24h
-                )
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public String extractEmail(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-}*/

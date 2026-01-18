@@ -1,0 +1,16 @@
+
+
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "npm",
+      "script": "test",
+      "isBackground": true,
+      "problemMatcher": "$tsc"
+    }
+  ]
+}
+
+

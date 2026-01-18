@@ -1,0 +1,40 @@
+<div class="demo-box">
+
+  <h3>🎧 Try Recording (No Login Required)</h3>
+  <p class="hint">
+    Click record → speak → click stop.
+  </p>
+
+  <div class="controls">
+    <button (click)="startRecording()" [disabled]="isRecording">
+      🎙️ Record
+    </button>
+
+    <button (click)="stopRecording()" [disabled]="!isRecording">
+      ⏹ Stop
+    </button>
+
+    <button (click)="playOriginal()" [disabled]="!canPlayOriginal">
+      ▶️ Play Original
+    </button>
+
+    <button (click)="playTrimmed()" [disabled]="!canPlayTrimmed">
+      ▶️ Play Trimmed
+    </button>
+
+    <button (click)="resetDemo()">
+      🔁 Repeat
+    </button>
+  </div>
+
+  <div #waveform class="waveform"></div>
+
+  <p class="instruction">
+    👉 Click at the start of the word, hold, and drag to the end of the word
+  </p>
+
+  <button (click)="trim()">
+    ✂️ Trim Selected Audio
+  </button>
+
+</div>

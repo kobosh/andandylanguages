@@ -1,0 +1,60 @@
+.demo-box {
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  border-radius: 10px;
+  background: #fafafa;
+  margin-bottom: 24px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #4f46e5;
+  color: white;
+}
+
+button:disabled {
+  background: #9ca3af;
+}
+
+.waveform {
+  border: 1px dashed #c7d2fe;
+  margin-top: 10px;
+}
+
+.hint {
+  font-size: 0.9em;
+  color: #374151;
+}
+
+.instruction {
+  font-size: 0.85em;
+  color: #6b7280;
+}
+.waveform-wrapper {
+  position: relative;
+}
+
+.drag-hint {
+  position: absolute;
+  top: 35px;
+  left: 20%;
+  color: #1976d2;
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%   { opacity: 0.2; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.2; }
+}

@@ -35,31 +35,5 @@ export class UploadService {
 
 
 
- /* upload(
-    word: string | null,
-    meaning: string | null,
-    blob: Blob,
-    filename: string
-  ): Observable<Object> {
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Not logged in');
-    }
-
-    const formData = new FormData();
-    formData.append('word', word ?? '');
-    formData.append('meaning', meaning ?? '');
-    formData.append('file', blob, filename);
-
-    return this.http.post(
-      '/api/recordings/upload',
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-  }*/
 }

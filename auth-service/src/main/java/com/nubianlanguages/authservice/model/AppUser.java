@@ -17,9 +17,7 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @NotBlank
-//    @Column(name = "username", nullable = false, unique = true)
-//    private String username;
+
 
     @Email
     @NotBlank

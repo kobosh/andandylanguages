@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 
 @Slf4j
-@Service
+//@Service
 public class FfmpegAudioService {
 
 

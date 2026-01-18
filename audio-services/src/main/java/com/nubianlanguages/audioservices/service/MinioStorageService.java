@@ -82,28 +82,6 @@ public class MinioStorageService implements StorageService {
     }
 
 
-   /* @Override
-    public String put(Long userId, MultipartFile file) {
-        String original = (file.getOriginalFilename() == null || file.getOriginalFilename().isBlank())
-                ? "recording.webm"
-                : file.getOriginalFilename();
-
-        String objectKey = userId + "/" + System.currentTimeMillis() + "-" + original;
-
-        try {
-            minio.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(objectKey)
-                            .stream(file.getInputStream(), file.getSize(), -1)
-                            .contentType(file.getContentType())
-                            .build()
-            );
-            return objectKey;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to upload to MinIO", e);
-        }
-    }*/
 
     @Override
     public InputStream get(String objectKey) {

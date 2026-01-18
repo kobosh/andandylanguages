@@ -11,13 +11,7 @@ import lombok.Setter;
 
 public class RegisterRequest {
     public RegisterRequest() {System.out.println("in registerrequest");}
-//changed this
-//    @Email
-//    @NotBlank
-//    private String name;
-  //to this
-//    @NotBlank
-//    private String userName;
+
 
     @Email
     @NotBlank

@@ -8,8 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.File;import java.io.IOException;
 
 @Service
 public class RecordingService {
@@ -30,65 +29,6 @@ public class RecordingService {
                 .replaceAll("[^a-z0-9]", "-")
                 .replaceAll("-+", "-");
     }
-
-
-/*
-    public Recording saveRecording(Long userId, RecordingRequest req) {
-        MultipartFile file = req.getFile();
-
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File must not be empty");
-        }
-
-        // Base name from original file, fallback if null/blank
-        String originalName = file.getOriginalFilename();
-        if (originalName == null || originalName.isBlank()) {
-            originalName = "recording.webm";
-        }
-
-        // Add timestamp to avoid overwriting
-        String uniqueName = System.currentTimeMillis() + "-" + originalName;
-// ✅ Use absolute base directory (VERY IMPORTANT)
-        File baseDir = new File(System.getProperty("user.home"), "andandylanguages-recordings");
-        File userDir = new File(baseDir, String.valueOf(userId));
-
-        // ✅ Create directories if missing
-        if (!userDir.exists()) {
-            boolean created = userDir.mkdirs();
-            if (!created) {
-                throw new RuntimeException("Failed to create directory: " + userDir.getAbsolutePath());
-            }
-        }
-        // recordings/<userId>/<uniqueName>
-       // File userDir = new File("recordings", String.valueOf(userId));
-        if (!userDir.exists() && !userDir.mkdirs()) {
-            throw new RuntimeException("Failed to create directory: " + userDir.getAbsolutePath());
-        }
-
-        File dest = new File(userDir, uniqueName);
-
-        try {
-            System.out.println("=== FILE DEBUG ===");
-            System.out.println("Original filename: " + file.getOriginalFilename());
-            System.out.println("Size: " + file.getSize());
-            System.out.println("Content type: " + file.getContentType());
-            System.out.println("Destination: " + dest.getAbsolutePath());
-            System.out.println("==================");
-            file.transferTo(dest);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save recording file", e);
-        }
-
-        Recording r = new Recording();
-        r.setUserId(Math.toIntExact(userId));
-        r.setWord(req.getWord());
-        r.setMeaning(req.getMeaning());
-        r.setFilename(uniqueName);
-        r.setFilePath(dest.getAbsolutePath());
-
-        return repo.save(r);
-    }
-*/
 
 
     //@Transactional

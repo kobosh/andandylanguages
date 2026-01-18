@@ -1,0 +1,69 @@
+<div #waveformContainer id="waveform"></div>
+
+<div>
+ <input
+    type="text"
+placeholder="Word"
+ [(ngModel)]="word"
+  />
+
+  <input
+    type="text"
+    placeholder="Meaning"
+    [(ngModel)]="meaning"
+  />
+</div>
+
+<br />
+
+<button (click)="start()">Record</button>
+<button (click)="stop()">Stop</button>
+<!--<button (click)="playPause()">Play / Pause</button>-->
+
+<br /><br />
+<!-- 🎧 Visual audio player -->
+<audio
+  *ngIf="audioUrl"
+  [src]="audioUrl"
+  controls
+></audio>
+<!-- 🌊 Waveform -->
+<div
+  #waveformContainer
+  style="width: 100%; height: 80px; margin-top: 10px;"
+></div>
+
+<br />
+
+<button
+  (click)="trimOnly()"
+  [disabled]="!recordedBlob"
+>
+  Trim
+</button>
+<button
+  (click)="uploadTrimmedCompressed()"
+  [disabled]="!trimmedBlob"
+>
+  Upload Trimmed (Compressed)
+</button>
+<h3>Use the word in a short sentence</h3>
+<!--<button (click)="startUsageRecording()">Record Sentence</button>-->
+
+<!--<button (click)="trimOnly()">Trim</button>-->
+
+<!--<br /><br />-->
+
+<!--<button-->
+<!--  (click)="uploadTrimmed()"-->
+<!--  [disabled]="!trimmedBlob"-->
+<!--&gt;-->
+<!--  Upload Trimmed-->
+<!--</button>-->
+
+<!--<button-->
+<!--  (click)="uploadOriginal()"-->
+<!--  [disabled]="!originalBlob"-->
+<!--&gt;-->
+<!--  Upload Original-->
+<!--</button>-->
