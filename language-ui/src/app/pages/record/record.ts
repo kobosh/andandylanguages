@@ -1,15 +1,10 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
-import {RecorderService} from '../../services/recorder.service';
-
-import {AudioEditService} from '../../services/audio-edit.service';
 
 import {UploadService} from '../../services/upload.service';
-import {WaveformService} from '../../services/waveform.service';
 import WaveSurfer from 'wavesurfer.js';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
-import {AuthInterceptor} from '../../auth.interceptor';
 
 
 @Component({
@@ -27,6 +22,7 @@ export class Record implements AfterViewInit {
   @ViewChild('waveformContainer')
   waveformContainer!: ElementRef<HTMLDivElement>;
 
+
   waveSurfer!: WaveSurfer;
   regionsPlugin!: RegionsPlugin;
 
@@ -40,6 +36,10 @@ export class Record implements AfterViewInit {
 
    word:string|null=null ;
   meaning:string|null=null ;
+  nowPlaying: "Original" | "Trimmed" | null = null;
+   uploading = false;
+  hasRegion: boolean | null=null;
+
   constructor(private uploadSrvc: UploadService) {
 
 
@@ -47,22 +47,33 @@ export class Record implements AfterViewInit {
 
 
   ngAfterViewInit() {
-    // 1️⃣ Create regions plugin (NO args)
     this.regionsPlugin = RegionsPlugin.create();
 
-    // 2️⃣ Create WaveSurfer
     this.waveSurfer = WaveSurfer.create({
       container: this.waveformContainer.nativeElement,
       waveColor: '#cfd8dc',
       progressColor: '#1976d2',
       height: 80,
-      normalize: false,
       plugins: [this.regionsPlugin]
     });
 
-    // 3️⃣ Enable drag selection (v7+ API)
     this.regionsPlugin.enableDragSelection({
       color: 'rgba(25, 118, 210, 0.2)'
+    });
+
+    // 🔥 IMPORTANT: region state tracking
+
+
+    this.regionsPlugin.on('region-created', () => {
+      this.hasRegion = true;
+      this.trimmedBlob = null;     // 🔥 invalidate old trim
+    });
+    this.regionsPlugin.on('region-updated', () => {
+      this.hasRegion = Object.keys(this.regionsPlugin.getRegions()).length > 0;
+    });
+
+    this.regionsPlugin.on('region-removed', () => {
+      this.hasRegion = Object.keys(this.regionsPlugin.getRegions()).length > 0;
     });
   }
 
@@ -73,10 +84,13 @@ export class Record implements AfterViewInit {
     this.recordedChunks = [];
     this.recordedBlob = null;
     this.trimmedBlob = null;
+    this.trimmedBlob = null;   // 🔥 REQUIRED
+    this.hasRegion = false;
+    this.nowPlaying = null;
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({audio: true});
 
-    this.recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+    this.recorder = new MediaRecorder(stream, {mimeType: 'audio/webm'});
 
     this.recorder.ondataavailable = (e) => {
       if (e.data.size > 0) {
@@ -86,7 +100,6 @@ export class Record implements AfterViewInit {
 
     this.recorder.start();
   }
-
   async stop() {
     if (!this.recorder || this.recorder.state !== 'recording') return;
 
@@ -97,11 +110,31 @@ export class Record implements AfterViewInit {
 
     if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
     this.audioUrl = URL.createObjectURL(this.recordedBlob);
+    this.trimmedBlob = null;   // 🔥
+    this.hasRegion = false;
+    this.nowPlaying = null;
+
+    this.regionsPlugin.clearRegions();
+    this.waveSurfer.load(this.audioUrl);
+  }
+
+
+  /*async stop() {
+    if (!this.recorder || this.recorder.state !== 'recording') return;
+
+    this.recorder.stop();
+    await new Promise<void>(r => this.recorder!.onstop = () => r());
+
+    this.recordedBlob = new Blob(this.recordedChunks, {type: 'audio/webm'});
+
+    if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
+    this.audioUrl = URL.createObjectURL(this.recordedBlob);
 
     // load waveform
     this.regionsPlugin.clearRegions();
     this.waveSurfer.load(this.audioUrl);
-  }
+  }*/
+
   async compressToWebM(wavBlob: Blob): Promise<Blob> {
     const audioCtx = new AudioContext();
     const buffer = await audioCtx.decodeAudioData(await wavBlob.arrayBuffer());
@@ -127,7 +160,7 @@ export class Record implements AfterViewInit {
       recorder.onstop = () => resolve();
     });
 
-    return new Blob(chunks, { type: 'audio/webm' });
+    return new Blob(chunks, {type: 'audio/webm'});
   }
 
   async uploadTrimmedCompressed() {
@@ -148,7 +181,7 @@ export class Record implements AfterViewInit {
     );
     console.log('🔥 UPLOAD METHOD ENTERED');
     const filename = `${this.word ?? 'audio'}-${Date.now()}.webm`;
-    const token=localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     console.log('🔥 TOKEN AT REQUEST TIME (SERVICE):', token);
     this.uploadSrvc.upload(
       this.word,
@@ -165,7 +198,6 @@ export class Record implements AfterViewInit {
     });
 
     this.uploadSrvc.upload(
-
       this.word,
       this.meaning,
       compressedBlob,
@@ -188,14 +220,13 @@ export class Record implements AfterViewInit {
     );
 
 
-
     const regions = Object.values(this.regionsPlugin.getRegions());
     if (regions.length === 0) {
       alert('Please select a region on the waveform');
       return;
     }
 
-    const { start, end } = regions[0];
+    const {start, end} = regions[0];
     console.log('Trimming', start, end);
 
     const ctx = new AudioContext();
@@ -227,6 +258,9 @@ export class Record implements AfterViewInit {
       this.trimmedBlob.size,
       'bytes'
     );
+    this.hasRegion = false; // reset after trim
+    this.nowPlaying = 'Trimmed';
+
   }
 
   encodeWav(buffer: AudioBuffer): Blob {
@@ -237,22 +271,34 @@ export class Record implements AfterViewInit {
     let o = 0;
     const w = (s: string) => [...s].forEach(c => view.setUint8(o++, c.charCodeAt(0)));
 
-    w('RIFF'); view.setUint32(o, 36 + samples.length * 2, true); o += 4;
-    w('WAVEfmt '); view.setUint32(o, 16, true); o += 4;
-    view.setUint16(o, 1, true); o += 2;
-    view.setUint16(o, 1, true); o += 2;
-    view.setUint32(o, buffer.sampleRate, true); o += 4;
-    view.setUint32(o, buffer.sampleRate * 2, true); o += 4;
-    view.setUint16(o, 2, true); o += 2;
-    view.setUint16(o, 16, true); o += 2;
-    w('data'); view.setUint32(o, samples.length * 2, true); o += 4;
+    w('RIFF');
+    view.setUint32(o, 36 + samples.length * 2, true);
+    o += 4;
+    w('WAVEfmt ');
+    view.setUint32(o, 16, true);
+    o += 4;
+    view.setUint16(o, 1, true);
+    o += 2;
+    view.setUint16(o, 1, true);
+    o += 2;
+    view.setUint32(o, buffer.sampleRate, true);
+    o += 4;
+    view.setUint32(o, buffer.sampleRate * 2, true);
+    o += 4;
+    view.setUint16(o, 2, true);
+    o += 2;
+    view.setUint16(o, 16, true);
+    o += 2;
+    w('data');
+    view.setUint32(o, samples.length * 2, true);
+    o += 4;
 
     samples.forEach(s => {
       view.setInt16(o, s * 0x7fff, true);
       o += 2;
     });
 
-    return new Blob([view], { type: 'audio/wav' });
+    return new Blob([view], {type: 'audio/wav'});
   }
 
   private formatBytes(size: number): string {
@@ -266,6 +312,69 @@ export class Record implements AfterViewInit {
   }
 
 
+  reset() {
+    console.log('RESET clicked');
+
+    // 🛑 Stop recording if active
+    if (this.recorder && this.recorder.state === 'recording') {
+      this.recorder.stop();
+    }
+
+    // 🛑 Stop microphone tracks
+    if (this.recorder?.stream) {
+      this.recorder.stream.getTracks().forEach(t => t.stop());
+    }
+
+    this.recorder = null;
+
+    // 🧹 Clear blobs
+    this.recordedChunks = [];
+    this.recordedBlob = null;
+    this.trimmedBlob = null;
+
+    // 🧹 Clear audio URL
+    if (this.audioUrl) {
+      URL.revokeObjectURL(this.audioUrl);
+      this.audioUrl = null;
+    }
+
+    // 🧹 Clear waveform + regions
+    this.waveSurfer.stop();
+    this.waveSurfer.empty();
+    this.regionsPlugin.clearRegions();
+
+
+    console.log('RESET complete');
+  }
+  playOriginal() {
+    if (!this.recordedBlob) return;
+    this.setAudio(this.recordedBlob, 'Original');
+    this.trimmedBlob = null;   // 🔥 invalidate old trim
+  }
+
+
+  playTrimmed() {
+    if (!this.trimmedBlob) return;
+    this.setAudio(this.trimmedBlob, 'Trimmed');
+  }
+
+  setAudio(blob: Blob, label: 'Original' | 'Trimmed') {
+    if (!this.waveSurfer) {
+      console.error('WaveSurfer not initialized');
+      return;
+    }
+
+    this.nowPlaying = label;
+
+    const url = URL.createObjectURL(blob);
+
+    this.waveSurfer.stop();
+    this.waveSurfer.load(url);
+
+    this.waveSurfer.once('ready', () => {
+      this.waveSurfer.play();
+    });
+  }
 
 }
 

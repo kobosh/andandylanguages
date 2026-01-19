@@ -1,69 +1,116 @@
-<div #waveformContainer id="waveform"></div>
+<div class="page">
 
-<div>
- <input
-    type="text"
-placeholder="Word"
- [(ngModel)]="word"
-  />
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Record a Word</h1>
+    <p>
+      Help preserve the language by recording a clear pronunciation.
+      Trim the audio and upload when ready.
+    </p>
+  </section>
 
-  <input
-    type="text"
-    placeholder="Meaning"
-    [(ngModel)]="meaning"
-  />
+  <!-- INSTRUCTIONS -->
+  <section class="card instructions">
+    <h2>How it works</h2>
+    <ol>
+      <li>Click <strong>Record</strong> and say the word clearly</li>
+      <li>Click <strong>Stop</strong> when finished</li>
+      <li>Review the recording</li>
+      <li>Select a region and click <strong>Trim</strong></li>
+      <li>Play trimmed audio to confirm</li>
+      <li>Click <strong>Upload</strong></li>
+      <li>Use <strong>Repeat</strong> anytime to start over</li>
+    </ol>
+  </section>
+
+  <!-- Word & Meaning -->
+  <div class="word-form">
+    <div class="form-field">
+      <label for="word">Word</label>
+      <input
+        id="word"
+        type="text"
+        [(ngModel)]="word"
+        placeholder="Enter the word"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="meaning">Meaning</label>
+      <input
+        id="meaning"
+        type="text"
+        [(ngModel)]="meaning"
+        placeholder="Enter the meaning"
+      />
+    </div>
+  </div>
+
+  <section class="card recorder">
+
+    <!-- Waveform -->
+    <div #waveformContainer class="waveform"></div>
+
+    <!-- Now playing indicator -->
+    <div class="now-playing" *ngIf="nowPlaying">
+      ▶ Now playing:
+      <strong>{{ nowPlaying }}</strong>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn primary" (click)="start()">Record</button>
+      <button class="btn danger" (click)="stop()">Stop</button>
+      <button class="btn secondary" (click)="reset()">Repeat</button>
+    </div>
+
+    <!-- Playback -->
+    <button
+      class="btn secondary"
+      [disabled]="!recordedBlob"
+      (click)="playOriginal()"
+    >
+      ▶ Play Original
+    </button>
+
+    <button
+      class="btn secondary"
+      [disabled]="!trimmedBlob"
+      (click)="playTrimmed()"
+    >
+      ▶ Play Trimmed
+    </button>
+
+
+
+    <!-- Actions -->
+    <div class="actions">
+      <button
+        class="btn secondary"
+        [disabled]="!recordedBlob || !hasRegion"
+        (click)="trimOnly()"
+      >
+        Trim
+      </button>
+
+      <button
+        class="btn success"
+        [disabled]="!trimmedBlob || uploading"
+        (click)="uploadTrimmedCompressed()"
+      >
+        Upload Trimmed
+      </button>
+    </div>
+
+  </section>
+
+  <!-- NEXT STEP -->
+  <section class="card next-step">
+    <h2>Use the word in a short sentence</h2>
+    <p>
+      After recording the word, you will be asked to record a short sentence
+      using it.
+    </p>
+  </section>
+
 </div>
-
-<br />
-
-<button (click)="start()">Record</button>
-<button (click)="stop()">Stop</button>
-<!--<button (click)="playPause()">Play / Pause</button>-->
-
-<br /><br />
-<!-- 🎧 Visual audio player -->
-<audio
-  *ngIf="audioUrl"
-  [src]="audioUrl"
-  controls
-></audio>
-<!-- 🌊 Waveform -->
-<div
-  #waveformContainer
-  style="width: 100%; height: 80px; margin-top: 10px;"
-></div>
-
-<br />
-
-<button
-  (click)="trimOnly()"
-  [disabled]="!recordedBlob"
->
-  Trim
-</button>
-<button
-  (click)="uploadTrimmedCompressed()"
-  [disabled]="!trimmedBlob"
->
-  Upload Trimmed (Compressed)
-</button>
-<h3>Use the word in a short sentence</h3>
-<!--<button (click)="startUsageRecording()">Record Sentence</button>-->
-
-<!--<button (click)="trimOnly()">Trim</button>-->
-
-<!--<br /><br />-->
-
-<!--<button-->
-<!--  (click)="uploadTrimmed()"-->
-<!--  [disabled]="!trimmedBlob"-->
-<!--&gt;-->
-<!--  Upload Trimmed-->
-<!--</button>-->
-
-<!--<button-->
-<!--  (click)="uploadOriginal()"-->
-<!--  [disabled]="!originalBlob"-->
-<!--&gt;-->
-<!--  Upload Original-->
-<!--</button>-->
