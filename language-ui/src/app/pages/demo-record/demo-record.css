@@ -29,6 +29,10 @@ button:disabled {
   border: 1px dashed #c7d2fe;
   margin-top: 10px;
 }
+.hint {
+  margin: 6px 0;
+  line-height: 1.4;
+}
 
 .hint {
   font-size: 0.9em;
@@ -57,4 +61,10 @@ button:disabled {
   0%   { opacity: 0.2; }
   50%  { opacity: 1; }
   100% { opacity: 0.2; }
+}
+.hint-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 16px;
 }

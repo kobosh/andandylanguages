@@ -5,7 +5,7 @@ import WaveSurfer from 'wavesurfer.js';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
-
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-record',
@@ -40,7 +40,7 @@ export class Record implements AfterViewInit {
    uploading = false;
   hasRegion: boolean | null=null;
 
-  constructor(private uploadSrvc: UploadService) {
+  constructor(private uploadSrvc: UploadService,private authservice:AuthService) {
 
 
   }

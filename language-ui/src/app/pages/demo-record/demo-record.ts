@@ -72,10 +72,7 @@ export class DemoRecordComponent implements AfterViewInit {
     this.recorder = new MediaRecorder(stream);
 
     this.recorder.ondataavailable = e => this.recordedChunks.push(e.data);
-   /* this.recorder.onstop = () => {
-      this.recordedBlob = new Blob(this.recordedChunks, { type: 'audio/webm' });
-      this.waveSurfer.loadBlob(this.recordedBlob);
-    };*/
+
     this.recorder.onstop = () => {
       this.recordedBlob = new Blob(this.recordedChunks, { type: 'audio/webm' });
       this.waveSurfer.loadBlob(this.recordedBlob);
@@ -89,6 +86,7 @@ export class DemoRecordComponent implements AfterViewInit {
     this.isRecording = true;
   }
   resetDemo() {
+
     this.waveSurfer.stop();
     this.waveSurfer.empty();
 

@@ -1,9 +1,19 @@
 <div class="demo-box">
+  <div>
 
   <h3>🎧 Try Recording (No Login Required)</h3>
   <p class="hint">
+    this is how selected region will look when you trim
+    <img src="/images/selectregionsmall.png" alt="image not found">
+  </p>
+  <p class="hint">
+    and this is how selected region will look like after you click trim
+    <img src="/images/selectedregionaftertrim.png" alt="image not found">
+  </p>
+  <p class="hint">
     Click record → speak → click stop.
   </p>
+</div>
 
   <div class="controls">
     <button (click)="startRecording()" [disabled]="isRecording">
@@ -17,11 +27,6 @@
     <button (click)="playOriginal()" [disabled]="!canPlayOriginal">
       ▶️ Play Original
     </button>
-
-    <button (click)="playTrimmed()" [disabled]="!canPlayTrimmed">
-      ▶️ Play Trimmed
-    </button>
-
     <button (click)="resetDemo()">
       🔁 Repeat
     </button>
@@ -31,10 +36,14 @@
 
   <p class="instruction">
     👉 Click at the start of the word, hold, and drag to the end of the word
+
+
   </p>
 
   <button (click)="trim()">
     ✂️ Trim Selected Audio
   </button>
-
+  <button (click)="playTrimmed()" [disabled]="!canPlayTrimmed">
+    ▶️ Play Trimmed
+  </button>
 </div>

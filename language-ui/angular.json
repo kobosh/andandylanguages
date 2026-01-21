@@ -9,6 +9,7 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -23,7 +24,9 @@
                 "glob": "**/*",
                 "input": "public"
               }
+
             ],
+
             "styles": [
               "src/styles.css"
 

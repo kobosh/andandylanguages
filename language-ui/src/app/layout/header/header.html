@@ -1,0 +1,11 @@
+<!-- header.component.html -->
+<header class="app-header">
+  <span class="logo">Andandy Languages</span>
+
+  <button
+    *ngIf="auth.isLoggedIn()"
+    class="logout-btn"
+    (click)="logout()">
+    Logout
+  </button>
+</header>
