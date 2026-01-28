@@ -19,7 +19,7 @@ export class UploadService {
     formData.append('file', blob, filename);
 
     const token = localStorage.getItem('token');
-    console.log('🔥 TOKEN AT REQUEST TIME (SERVICE):', token);
+    //console.log('🔥 TOKEN AT REQUEST TIME (SERVICE):', token);
 
 
     return this.http.post(

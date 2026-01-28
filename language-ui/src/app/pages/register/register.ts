@@ -29,7 +29,8 @@ export class Register {
     this.http.post('http://localhost:8082/api/auth/register', {   // ✅ FIX
       //name: this.name,
       email: this.email,
-      password: this.password
+      password: this.password,
+      name: this.name
     }).subscribe({
       next: () => {
         this.success = 'Registration successful! Redirecting...';

@@ -16,7 +16,9 @@ public class RegisterRequest {
     @Email
     @NotBlank
     private String email;
+    @NotBlank
 
+    private String name;
     @NotBlank
     @Size(min = 6)
     private String password;

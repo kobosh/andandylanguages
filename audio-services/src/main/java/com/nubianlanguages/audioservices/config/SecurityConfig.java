@@ -23,6 +23,7 @@ public class SecurityConfig {
                 // ❌ no sessions, no CSRF (API)
                 .csrf(csrf -> csrf.disable())
 
+
                 // ✅ allow H2 console iframe (DEV ONLY)
                 .headers(headers ->
                         headers.frameOptions(frame -> frame.sameOrigin())
@@ -35,7 +36,9 @@ public class SecurityConfig {
                         // 🔓 dev / infra
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/recordings/*/audio").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
 
                         // 🔐 audio APIs require JWT
                         .requestMatchers("/api/recordings/**").authenticated()

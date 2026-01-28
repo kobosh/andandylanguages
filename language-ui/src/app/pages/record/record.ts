@@ -45,7 +45,18 @@ export class Record implements AfterViewInit {
 
   }
 
+  fullName: string | null = null;
+  //String token = this.authservice.generateToken(user, expirationMs);
 
+  ngOnInit() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      this.fullName = payload.fullName;
+      console.log("full name is not null ?????? ",this.fullName);
+    }
+  }
   ngAfterViewInit() {
     this.regionsPlugin = RegionsPlugin.create();
 
@@ -135,6 +146,7 @@ export class Record implements AfterViewInit {
     this.waveSurfer.load(this.audioUrl);
   }*/
 
+
   async compressToWebM(wavBlob: Blob): Promise<Blob> {
     const audioCtx = new AudioContext();
     const buffer = await audioCtx.decodeAudioData(await wavBlob.arrayBuffer());
@@ -179,10 +191,10 @@ export class Record implements AfterViewInit {
       '→ Compressed:',
       this.formatBytes(compressedBlob.size)
     );
-    console.log('🔥 UPLOAD METHOD ENTERED');
+    //console.log('🔥 UPLOAD METHOD ENTERED');
     const filename = `${this.word ?? 'audio'}-${Date.now()}.webm`;
     const token = localStorage.getItem('token');
-    console.log('🔥 TOKEN AT REQUEST TIME (SERVICE):', token);
+   // console.log('🔥 TOKEN AT REQUEST TIME (SERVICE):', token);
     this.uploadSrvc.upload(
       this.word,
       this.meaning,
@@ -197,15 +209,7 @@ export class Record implements AfterViewInit {
       }
     });
 
-    this.uploadSrvc.upload(
-      this.word,
-      this.meaning,
-      compressedBlob,
-      `${Date.now()}-trimmed.webm`
-    ).subscribe({
-      next: () => console.log('Compressed trimmed uploaded'),
-      error: (e: any) => console.error('Upload failed', e)
-    });
+
   }
 
   async trimOnly() {

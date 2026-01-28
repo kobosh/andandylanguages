@@ -20,7 +20,8 @@ public class JwtService {
         this.privateKey = keyLoader.loadPrivateKey();
     }
 
-    public String generateToken(String userId, long expirationMs) {
+    public String generateToken(String userId, long expirationMs,String fullname) {
+        System.out.println();
         try {
             JWTClaimsSet claims = new JWTClaimsSet.Builder()
                     .subject(userId)
@@ -28,6 +29,7 @@ public class JwtService {
                     .expirationTime(
                             Date.from(Instant.now().plusMillis(expirationMs))
                     )
+                    .claim("fullName", fullname)
                     .build();
 
             SignedJWT jwt = new SignedJWT(
@@ -43,4 +45,10 @@ public class JwtService {
         }
     }
 }
+/*JwtClaimsSet claims = JwtClaimsSet.builder()
+        .subject(userId)
+        .claim("fullName", user.getFullname())
+        .issuedAt(Instant.now())
+        .expiresAt(Instant.now().plusMillis(expirationMs))
+        .build();*/
 

@@ -7,6 +7,7 @@ import com.nubianlanguages.authservice.repository.UserRepository;
 import com.nubianlanguages.authservice.security.JwtService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +20,15 @@ public class AuthController {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final  PasswordEncoder passwordEncoder;
 
     @Value("${jwt.expiration-ms}")
     private long expirationMs;
 
-    public AuthController(JwtService jwtService, UserRepository userRepository) {
+    public AuthController(JwtService jwtService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
@@ -38,7 +41,8 @@ public class AuthController {
         // 🔑 Authentication already succeeded
         String token = jwtService.generateToken(
                 user.getId().toString(),
-                expirationMs
+                expirationMs,
+                user.getFullname()
         );
 
         return ResponseEntity.ok(
@@ -66,18 +70,34 @@ public class AuthController {
         user.setEmail(request.getEmail());
         // ⚠️ Plain text for now (OK for dev, NOT prod)
         user.setPassword(request.getPassword());
-        //user.setPassword(passwordEncoder.encode(request.getPassword()));
+       // user.setPassword(passwordEncoder.encode(request.getPassword()));
         // OPTIONAL: only set name if it exists
-//        if (request.getName() != null) {
-//            user.setName(request.getName());
-//        }
+        if (request.getName() != null) {
+            user.setFullname(request.getName());
+        }
 
         userRepository.save(user);
 
         System.out.println("✅ Saved to H2 MEM: " + user.getEmail());
+// 4️⃣ Issue JWT immediately after register
+        String token = jwtService.generateToken(
+                user.getId().toString(),
+                expirationMs, user.getFullname()
 
-        return ResponseEntity.status(201)
-                .body(Map.of("message", "registered"));
+        );
+
+// 5️⃣ Return token + expiration
+        return ResponseEntity.status(201).body(
+                Map.of(
+                        "accessToken", token,
+                        "expiresIn", expirationMs / 1000,          // seconds
+                        "expiresAt",
+                        user.getFullname()// epoch ms
+
+                )
+        );
+
+
     }
 
 }

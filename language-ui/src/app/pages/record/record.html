@@ -2,6 +2,9 @@
 
   <!-- HERO -->
   <section class="hero">
+    <h2 *ngIf="fullName">
+      👋 Welcome, {{ fullName }}!
+    </h2>
     <h1>Record a Word</h1>
     <p>
       Help preserve the language by recording a clear pronunciation.
@@ -104,6 +107,15 @@
     </div>
 
   </section>
+  <div>
+    <section>
+      <a href="http://localhost:8083/api/recordings/1/stream" target="_blank">
+        ▶ Play recording
+      </a>
+
+    </section>
+
+  </div>
 
   <!-- NEXT STEP -->
   <!--<section class="card next-step">

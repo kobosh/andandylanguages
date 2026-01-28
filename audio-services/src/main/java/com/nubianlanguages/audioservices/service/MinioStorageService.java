@@ -1,14 +1,24 @@
 package com.nubianlanguages.audioservices.service;
 
+import com.nubianlanguages.audioservices.entity.Recording;
+import com.nubianlanguages.audioservices.repository.RecordingRepository;
 import io.minio.*;
+import io.minio.errors.*;
+import io.minio.http.Method;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 //import  com.nubianlanguages.audioservices.service
 @Service
@@ -16,11 +26,41 @@ public class MinioStorageService implements StorageService {
 
     private final MinioClient minio;
     private final String bucket;
-
+    private final RecordingRepository recordingRepository;
     public MinioStorageService(MinioClient minio,
-                               @Value("${minio.bucket}") String bucket) {
+                               @Value("${minio.bucket}") String bucket, RecordingRepository recordingRepository) {
         this.minio = minio;
         this.bucket = bucket;
+        this.recordingRepository = recordingRepository;
+    }
+    public String getminiourl(Long id) throws ServerException,
+            InsufficientDataException, ErrorResponseException, IOException,
+            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+       Recording rec = recordingRepository.findById(id)
+              .orElseThrow(() -> new RuntimeException("Recording not found"));
+        String key = rec.getObjectKey();
+
+        String url = minio.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .method(Method.GET)
+                        .bucket("language-sound")
+                        .object(key)
+                        .expiry(10 * 60) // 10 minutes
+                        .build()
+        );
+
+        return url;
+    }
+    public String getMinioUrlByObjectKey(String objectKey) throws Exception {
+
+        return minio.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .method(Method.GET)
+                        .bucket("language-sound")
+                        .object(objectKey)
+                        .expiry(10 * 60)
+                        .build()
+        );
     }
     public String upload(MultipartFile file) {
         try {
