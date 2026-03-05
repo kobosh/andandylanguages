@@ -1,28 +1,30 @@
-server:
-  port: 8080
+port: 8083
 
 spring:
+
+  security:
+     oauth2:
+        resourceserver:
+          jwt:
+            jwk-set-uri=${JWT_JWKS_URI}:
   datasource:
-    url: jdbc:h2:file:/data/audiodb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
+    url: ${SPRING_DATASOURCE_URL}          # jdbc:postgresql://postgres:5432/audiodb
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      settings:
-        web-allow-others: true
-
-    # optional but recommended (silences warning and avoids lazy DB hits during view rendering)
   jpa:
-      open-in-view: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  jwt:
+    secret: ${JWT_SECRET}
 
-jwt:
-  secret: ${JWT_SECRET}
-minio:
-  url: http://minio:9000
-  access-key: minioadmin
-  secret-key: minioadmin
-  bucket: language-sound
+  minio:
+    url: http://minio:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    bucket:
+      word: wordbucket
+      sentence: sentencebucket

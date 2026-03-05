@@ -8,5 +8,7 @@ public class RecordingRequest {
     private String authorName;
     private String word;
     private String meaning;
+    private String sentence;
+    private String sentenceMeaning;
     private MultipartFile file;
 }

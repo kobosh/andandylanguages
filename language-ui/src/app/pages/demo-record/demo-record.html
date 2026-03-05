@@ -1,13 +1,17 @@
-<div class="demo-box">
+<div class="demo-box" style="background-color: yellow">
   <div>
 
-  <h3>🎧 Try Recording (No Login Required)</h3>
+  <h3>🎧 Practice Recording (No Login Required)</h3>
+    <p class="hint">
+      this is how  recorded audio  will look when you trim
+      <img src="/images/recordedaudio.png" alt="image not found">
+    </p>
   <p class="hint">
     this is how selected region will look when you trim
     <img src="/images/selectregionsmall.png" alt="image not found">
   </p>
   <p class="hint">
-    and this is how selected region will look like after you click trim
+    and this is how selected region will look like after you click trim<br>
     <img src="/images/selectedregionaftertrim.png" alt="image not found">
   </p>
   <p class="hint">
@@ -46,4 +50,10 @@
   <button (click)="playTrimmed()" [disabled]="!canPlayTrimmed">
     ▶️ Play Trimmed
   </button>
+</div>
+<!-- Usage Sentence -->
+<div class="form-field">
+  <label>📝 Use the word in a sentence</label>
+
+
 </div>

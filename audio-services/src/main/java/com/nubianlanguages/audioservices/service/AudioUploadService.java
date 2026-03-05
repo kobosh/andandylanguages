@@ -16,10 +16,22 @@ public class AudioUploadService {
 
     private final MinioClient minioClient;
 
-    @Value("${minio.bucket}")
-    private String bucketName;
+    @Value("${minio.bucket.word}")
+    private String wordBucket;
+
+    @Value("${minio.bucket.sentence}")
+    private String sentenceBucket;
 
     @PostConstruct
+    public void createBucketsIfNotExists() {
+
+        System.out.println("AudioUploadService: Checking MinIO buckets");
+
+        createIfMissing(wordBucket);
+        createIfMissing(sentenceBucket);
+    }
+
+   /* @PostConstruct
     public void createBucketIfNotExists() {
         System.out.println("AudioUploadService CreatBucket");
         try {
@@ -34,7 +46,47 @@ public class AudioUploadService {
             System.out.println("MinIO not ready at startup. Will retry on upload.");
             System.out.println("Reason: " + e.getMessage());
         }
+    }*/
+    private void createIfMissing(String bucket) {
+        try {
+            boolean exists = minioClient.bucketExists(
+                    BucketExistsArgs.builder().bucket(bucket).build()
+            );
+
+            if (!exists) {
+                minioClient.makeBucket(
+                        MakeBucketArgs.builder().bucket(bucket).build()
+                );
+
+                System.out.println("Created bucket: " + bucket);
+            } else {
+                System.out.println("Bucket exists: " + bucket);
+            }
+
+        } catch (Exception e) {
+
+            // Do NOT crash service (important in Docker)
+            System.out.println("MinIO not ready for bucket: " + bucket);
+            System.out.println("Reason: " + e.getMessage());
+        }
     }
+
+
+
+
+
+
+private void ensureBucket(String bucket) throws Exception {
+    if (!minioClient.bucketExists(
+            BucketExistsArgs.builder().bucket(bucket).build()
+    )) {
+        minioClient.makeBucket(
+                MakeBucketArgs.builder().bucket(bucket).build()
+        );
+    }
+}
+
+
 
     public String upload(MultipartFile file) {
         try {
@@ -42,7 +94,7 @@ public class AudioUploadService {
 
             minioClient.putObject(
                     PutObjectArgs.builder()
-                            .bucket(bucketName)
+                            .bucket(wordBucket)
                             .object(fileName)
                             .stream(file.getInputStream(), file.getSize(), -1)
                             .contentType(file.getContentType())

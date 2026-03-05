@@ -37,6 +37,7 @@ export class DemoRecordComponent implements AfterViewInit {
   trimmedBlob: Blob | null = null;
 
   isRecording = false;
+  protected usageSentence: string='';
 
   ngAfterViewInit() {
     // ✅ create regions plugin
@@ -45,8 +46,8 @@ export class DemoRecordComponent implements AfterViewInit {
     // ✅ create WaveSurfer
     this.waveSurfer = WaveSurfer.create({
       container: this.waveform.nativeElement,
-      waveColor: '#cfd8dc',
-      progressColor: '#1976d2',
+      waveColor: '#111' ,//'#cfd8dc',
+      progressColor:'#111',// '#1976d2',
       height: 80,
       plugins: [this.regions]
     });

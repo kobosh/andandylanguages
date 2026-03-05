@@ -6,10 +6,11 @@ import {Router, RouterOutlet} from '@angular/router';
 import { RouterLink } from '@angular/router';
 import {FormBuilder,FormGroup,ReactiveFormsModule} from "@angular/forms"
 import {DemoRecordComponent} from '../demo-record/demo-record';
+import {IdleService} from '../../services/IdleService';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterLink,ReactiveFormsModule,DemoRecordComponent],
+  imports: [CommonModule, FormsModule,RouterLink,ReactiveFormsModule, DemoRecordComponent],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
@@ -20,17 +21,20 @@ export class Login {
   error: string = '';
    loginForm : FormGroup;
 
+
   constructor(
      private fb: FormBuilder,
      private http: HttpClient,
-     private router: Router
+     private router: Router, private idleService: IdleService
   ) {
     this.loginForm = this.fb.group({
       email: [''],
       password: ['']
      });
   }
-
+  ngOnInit() {
+    this.idleService.stopWatching();
+  }
   login() {
     console.log("in log in");
     this.http.post('http://localhost:8082/api/auth/login',
@@ -42,7 +46,9 @@ export class Login {
         console.log("IN LOG IN ??????",resp);
        localStorage.setItem('token', resp.accessToken);
         console.log('🔥 TOKEN AFTER LOGIN:', localStorage.getItem('token'));
+        //localStorage.setItem('token', resp.accessToken);
 
+        this.idleService.startWatching();
         this.router.navigate(['/record']);
       },
       error: () => {

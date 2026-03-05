@@ -1,22 +1,25 @@
 version: "3.9"
 
 services:
-  audio-services:
-    build: .
-    ports:
-      - "8080:8080"
-    depends_on:
-      - minio
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      MINIO_URL: http://minio:9000
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
+
+  postgres:
+    image: postgres:16
+    container_name: pg-audio
     restart: unless-stopped
+    environment:
+      POSTGRES_DB: audiodb
+      POSTGRES_USER: audio
+      POSTGRES_PASSWORD: audio123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_audio_data:/var/lib/postgresql/data
 
   minio:
     image: minio/minio
+    container_name: minio
     command: server /data --console-address ":9001"
+    restart: unless-stopped
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -25,7 +28,29 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
       - minio-data:/data
+
+  audio-services:
+    build: .
+    container_name: audio-services
     restart: unless-stopped
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+      - minio
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+      # MinIO
+      MINIO_URL: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+
+      # Postgres (use these in application-docker.properties)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/audiodb
+      SPRING_DATASOURCE_USERNAME: audio
+      SPRING_DATASOURCE_PASSWORD: audio123
 
 volumes:
+  pg_audio_data:
   minio-data:

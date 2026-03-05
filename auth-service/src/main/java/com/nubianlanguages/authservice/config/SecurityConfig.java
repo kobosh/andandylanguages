@@ -32,9 +32,10 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
 
-                // 🔴 Explicit authorization rules
+                // 🔴 Explicit authorization rules  .requestMatchers("/api/recordings/**").authenticated();
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/recordings/**",
                                 "/api/auth/register",
                                 "/api/auth/login",
                                 "/.well-known/jwks.json",
@@ -48,6 +49,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

@@ -4,7 +4,8 @@ import {UploadService} from '../../services/upload.service';
 import WaveSurfer from 'wavesurfer.js';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
+//import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import {AuthService} from '../../services/auth.service';
 
 @Component({
@@ -39,7 +40,8 @@ export class Record implements AfterViewInit {
   nowPlaying: "Original" | "Trimmed" | null = null;
    uploading = false;
   hasRegion: boolean | null=null;
-
+  isWordMode: boolean = true;
+  public currentRecordingId: number|null=null;
   constructor(private uploadSrvc: UploadService,private authservice:AuthService) {
 
 
@@ -145,6 +147,8 @@ export class Record implements AfterViewInit {
     this.regionsPlugin.clearRegions();
     this.waveSurfer.load(this.audioUrl);
   }*/
+  protected meaningText: any;
+  protected text: any;
 
 
   async compressToWebM(wavBlob: Blob): Promise<Blob> {
@@ -174,8 +178,76 @@ export class Record implements AfterViewInit {
 
     return new Blob(chunks, {type: 'audio/webm'});
   }
-
   async uploadTrimmedCompressed() {
+    if (!this.trimmedBlob) { alert('Trim first'); return; }
+
+    if (!this.text || !this.meaningText) {
+      alert(this.isWordMode ? 'Enter word + meaning' : 'Enter sentence + sentence meaning');
+      return;
+    }
+
+    if (!this.isWordMode && !this.currentRecordingId) {
+      alert('Missing recording id. Upload the word first.');
+      return;
+    }
+
+    const compressedBlob = await this.compressToWebM(this.trimmedBlob);
+
+    const safeBase = this.text.toString().trim().replace(/\s+/g, '_');
+    const filename = `${this.isWordMode ? 'word' : 'sentence'}-${safeBase}-${Date.now()}.webm`;
+
+    this.uploading = true;
+
+    const req$ = this.isWordMode
+      ? this.uploadSrvc.uploadWord(this.text, this.meaningText, compressedBlob, filename)
+      : this.uploadSrvc.uploadSentence(
+        this.currentRecordingId!,
+        this.text,
+        this.meaningText,
+        compressedBlob,
+        filename
+      );
+
+    req$.subscribe({
+      next: (resp: any) => {
+        console.log('Upload success', resp);
+        alert('upload success');
+
+        if (this.isWordMode) {
+          const id = Number(resp?.id);
+          if (!id) {
+            console.error('Upload word response missing id', resp);
+            alert('Upload succeeded but no recording id returned.');
+            return;
+          }
+          this.currentRecordingId = id;
+          this.isWordMode = false;
+        } else {
+          this.isWordMode = true;
+          this.currentRecordingId = null;
+        }
+
+        // reset audio state so next step can’t reuse old blobs/regions
+        this.trimmedBlob = null;
+        this.recordedBlob = null;
+        this.recordedChunks = [];
+        this.hasRegion = false;
+        this.nowPlaying = null;
+        this.audioUrl = null;
+        this.regionsPlugin?.clearRegions?.();
+      },
+      error: (err: any) => {
+        console.error('Upload failed', err);
+        alert('Upload failed (check console / backend logs).');
+        this.uploading = false;
+      },
+      complete: () => {
+        this.uploading = false;
+      }
+    });
+  }
+
+/*  async uploadTrimmedCompressed() {
     if (!this.trimmedBlob) {
       alert('Trim first');
       return;
@@ -195,22 +267,110 @@ export class Record implements AfterViewInit {
     const filename = `${this.word ?? 'audio'}-${Date.now()}.webm`;
     const token = localStorage.getItem('token');
    // console.log('🔥 TOKEN AT REQUEST TIME (SERVICE):', token);
+    const blobToUpload = compressedBlob;  // ✅ ALWAYS upload compressed
+
+    console.log("UPLOADING type:", blobToUpload.type);
+    console.log("UPLOADING size:", blobToUpload.size);
     this.uploadSrvc.upload(
       this.word,
       this.meaning,
-      this.trimmedBlob!,
+      blobToUpload,//this.trimmedBlob!,
       filename
     ).subscribe({
+
+
       next: resp => {
+        this.reset();
+        alert("upload success");
         console.log('Upload success', resp);
       },
       error: err => {
+        alert("upload failed");
         console.error('Upload failed', err);
       }
     });
 
 
-  }
+  }*/
+  /*async uploadTrimmedCompressed() {
+    if (!this.trimmedBlob) {
+      alert('Trim first');
+      return;
+    }
+
+    if (!this.text || !this.meaningText) {
+      alert(this.isWordMode ? 'Enter word + meaning' : 'Enter sentence + sentence meaning');
+      return;
+    }
+
+    // sentence step MUST have recording id so backend can update the row
+    if (!this.isWordMode && !this.currentRecordingId) {
+      alert('Missing recording id. Upload the word first.');
+      return;
+    }
+
+    console.log('Compressing trimmed audio…');
+    const compressedBlob = await this.compressToWebM(this.trimmedBlob);
+
+    console.log(
+      'Trimmed WAV:',
+      this.formatBytes(this.trimmedBlob.size),
+      '→ Compressed:',
+      this.formatBytes(compressedBlob.size)
+    );
+
+    const safeBase = this.text.toString().trim().replace(/\s+/g, '_');
+    const filename = `${this.isWordMode ? 'word' : 'sentence'}-${safeBase}-${Date.now()}.webm`;
+
+    const blobToUpload = compressedBlob;
+
+    console.log('UPLOADING type:', blobToUpload.type);
+    console.log('UPLOADING size:', blobToUpload.size);
+
+    this.uploading = true;
+
+    const req$ = this.isWordMode
+      ? this.uploadSrvc.uploadWord(this.text, this.meaningText, blobToUpload, filename)
+      : this.uploadSrvc.uploadSentence(
+        this.currentRecordingId!,   // ✅ IMPORTANT: update the same row
+        this.text,                  // sentence text
+        this.meaningText,           // sentenceMeaning
+        blobToUpload,
+        filename
+      );
+
+    req$.subscribe({
+      next: (resp: any) => {
+        alert('upload success');
+        console.log('Upload success', resp);
+
+        // ✅ move to next step deterministically (no double toggles)
+        if (this.isWordMode) {
+          // after uploading word, store id and go to sentence step
+          this.currentRecordingId = resp.id;
+          this.isWordMode = false;
+        } else {
+          // after uploading sentence, finish and go back to word step
+          this.isWordMode = true;
+          this.currentRecordingId = null; // ready for next word+sentence pair
+        }
+
+        // reset UI for next recording
+        this.reset(); // recommended now: clear waveform/regions/blobs
+
+        // clear shared inputs
+        this.text = '';
+        this.meaningText = '';
+
+        this.uploading = false;
+      },
+      error: (err) => {
+        alert('upload failed');
+        console.error('Upload failed', err);
+        this.uploading = false;
+      }
+    });
+  }*/
 
   async trimOnly() {
     if (!this.recordedBlob) {
@@ -377,6 +537,16 @@ export class Record implements AfterViewInit {
 
     this.waveSurfer.once('ready', () => {
       this.waveSurfer.play();
+    });
+  }
+  playFromServer(recordingId: number) {
+    const audio = new Audio();
+    const audioUrl = `http://localhost:8083/api/recordings/${recordingId}/stream`;
+
+    audio.src = audioUrl;
+    audio.load();
+    audio.play().catch(err => {
+      console.error('Audio play failed', err);
     });
   }
 

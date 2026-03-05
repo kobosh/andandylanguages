@@ -16,13 +16,14 @@ public class AudioService {
 
     private final MinioClient minioClient;
 
-    @Value("${minio.bucket}")
+    @Value("${minio.bucket.word}")
     private String bucketName;
 
     @Value("${minio.url}")
     private String minioUrl;
 
-    public AudioService(MinioClient minioClient) {
+    public AudioService(MinioClient minioClient)
+    {   System.out.println("audio servic construct");
         this.minioClient = minioClient;
     }
 

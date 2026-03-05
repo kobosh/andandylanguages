@@ -15,6 +15,6 @@ export class App implements OnInit{
   constructor(private idleService: IdleService) {}
   title = signal('language-ui');
   ngOnInit() {
-    this.idleService.startWatching();
+   // this.idleService.startWatching();
   }
 }

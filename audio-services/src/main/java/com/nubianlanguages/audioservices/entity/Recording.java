@@ -2,8 +2,9 @@ package com.nubianlanguages.audioservices.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -11,38 +12,39 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-/*public class Recording {
+@Table(name = "recording")
+public class Recording {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private Integer userId;
+    private Long id;
+
+    @Column(nullable = false)
+    private Long userId;
+
+    @Column(nullable = false)
     private String word;
+
+    @Column(nullable = false)
     private String meaning;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RecordingType type;   // WORD or USAGE
-    // 🔗 link USAGE → WORD
-    private Integer parentRecordingId;
-    @Column(nullable = false)
-    private String objectKey;     // MinIO key
 
-    //private Instant createdAt = Instant.now();
-}*/
+    private String sentence;
+    private String sentenceMeaning;
 
-public class Recording {
+    // Must be nullable because first save happens before upload
+    @Column(nullable = true)
+    private String wordObjectKey;
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Integer id;
-
-        private Integer userId;
-
-        private String word;
-
-        private String meaning;
-
+    @Column(nullable = true)
+    private String sentenceObjectKey;
 
     @Column(nullable = false)
-    private String objectKey;
-    }
+    private boolean wordUploaded = false;
+
+    @Column(nullable = false)
+    private boolean sentenceUploaded = false;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+}

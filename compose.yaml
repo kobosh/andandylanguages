@@ -1,35 +1,36 @@
 version: "3.9"
 
 services:
-  language-ui:
-    build: ./language-ui
+  postgres:
+    image: postgres:16
+    container_name: pg-audio
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: audiodb
+      POSTGRES_USER: audio
+      POSTGRES_PASSWORD: audio123
     ports:
-      - "4200:80"
-    depends_on:
-      - auth-service
-      - audio-services
+      - "5432:5432"
+    volumes:
+      - pg_audio_data:/var/lib/postgresql/data
 
   auth-service:
     build: ./auth-service
+    container_name: auth-service
+    restart: unless-stopped
     ports:
       - "8082:8082"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      JWT_EXPIRATION_MS: ${EXPIRATION_MS:-600000}
 
-  audio-services:
-    build: ./audio-services
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      JWT_SECRET: XcYrNNwJ0SbxazMJT2HkCDaNg9yqAPqBtCTRtbeyM2o=
-      MINIO_URL: http://minio:9000
-    depends_on:
-      - minio
-      - auth-service
+    volumes:
+      - auth_h2_data:/data
 
   minio:
     image: minio/minio
+    container_name: minio
+    restart: unless-stopped
     command: server /data --console-address ":9001"
     ports:
       - "9000:9000"
@@ -40,5 +41,35 @@ services:
     volumes:
       - minio-data:/data
 
+  audio-services:
+    build: ./audio-services
+    container_name: audio-services
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+      # JWT (audio verifies tokens by fetching JWKS from auth-service)
+      JWT_JWKS_URI: http://auth-service:8082/.well-known/jwks.json
+
+      # MinIO
+      MINIO_URL: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_WORD_BUCKET: wordbucket
+      MINIO_SENTENCE_BUCKET: sentencebucket
+
+      # Postgres (audio DB)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/audiodb
+      SPRING_DATASOURCE_USERNAME: audio
+      SPRING_DATASOURCE_PASSWORD: audio123
+    depends_on:
+      - postgres
+      - minio
+      - auth-service
+
 volumes:
+  pg_audio_data:
+  auth_h2_data:
   minio-data:

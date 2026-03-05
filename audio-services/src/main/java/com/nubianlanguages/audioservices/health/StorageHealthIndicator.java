@@ -15,7 +15,7 @@ public class StorageHealthIndicator implements HealthIndicator {
     private final String bucket;
 
     public StorageHealthIndicator(MinioClient minio,
-                                  @Value("${minio.bucket}") String bucket) {
+                                  @Value("${minio.bucket.word}") String bucket) {
         this.minio = minio;
         this.bucket = bucket;
     }

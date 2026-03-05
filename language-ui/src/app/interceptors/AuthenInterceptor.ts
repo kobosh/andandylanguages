@@ -26,6 +26,11 @@ export class AuthenInterceptor implements HttpInterceptor {
 
     return next.handle(authReq).pipe(
       catchError(err => {
+        // ✅ Backend unreachable / CORS / connection refused
+        if (err.status === 0) {
+          alert('🚫 Cannot reach backend. Is it running? (auth/recording/audio)');
+          return throwError(() => err);
+        }
         if (err.status === 401) {
           localStorage.removeItem('token');
           alert('🔐 Session expired. Please log in again.');

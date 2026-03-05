@@ -18,17 +18,13 @@ import java.util.List;
 //
 //import java.util.List;
 import java.util.Optional;
-
 public interface RecordingRepository extends JpaRepository<Recording, Long> {
 
-    // Find the original WORD recording
-  //  Optional<Recording> findByEmaile(String email);
+    Optional<Recording> findByIdAndUserId(Long id, Long userId);
 
+    List<Recording> findAllByUserIdOrderByIdDesc(Long userId);
 
-
-    // Optional: all recordings by a user
-   // List<Recording> findByUserId(Integer userId);
+    boolean existsByIdAndUserId(Long id, Long userId);
 }
-
 
 
