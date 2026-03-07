@@ -34,6 +34,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
+
+
         AppUser user = userRepository.findByEmail(request.getEmail())
                 .filter(u -> u.getPassword().equals(request.getPassword())) // example
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
@@ -70,7 +72,7 @@ public class AuthController {
         user.setEmail(request.getEmail());
         // ⚠️ Plain text for now (OK for dev, NOT prod)
         user.setPassword(request.getPassword());
-       // user.setPassword(passwordEncoder.encode(request.getPassword()));
+        //user.setPassword(passwordEncoder.encode(request.getPassword()));
         // OPTIONAL: only set name if it exists
         if (request.getName() != null) {
             user.setFullname(request.getName());

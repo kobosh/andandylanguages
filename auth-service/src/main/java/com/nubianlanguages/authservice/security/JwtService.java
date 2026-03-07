@@ -45,10 +45,5 @@ public class JwtService {
         }
     }
 }
-/*JwtClaimsSet claims = JwtClaimsSet.builder()
-        .subject(userId)
-        .claim("fullName", user.getFullname())
-        .issuedAt(Instant.now())
-        .expiresAt(Instant.now().plusMillis(expirationMs))
-        .build();*/
+
 

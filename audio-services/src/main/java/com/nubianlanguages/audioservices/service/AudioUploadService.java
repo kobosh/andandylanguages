@@ -31,22 +31,7 @@ public class AudioUploadService {
         createIfMissing(sentenceBucket);
     }
 
-   /* @PostConstruct
-    public void createBucketIfNotExists() {
-        System.out.println("AudioUploadService CreatBucket");
-        try {
-            boolean exists = minioClient.bucketExists(
-                    BucketExistsArgs.builder().bucket(bucketName).build()
-            );
-            if (!exists) {
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-            }
-        } catch (Exception e) {
-            // ✅ LOG ONLY — DO NOT CRASH APP
-            System.out.println("MinIO not ready at startup. Will retry on upload.");
-            System.out.println("Reason: " + e.getMessage());
-        }
-    }*/
+
     private void createIfMissing(String bucket) {
         try {
             boolean exists = minioClient.bucketExists(

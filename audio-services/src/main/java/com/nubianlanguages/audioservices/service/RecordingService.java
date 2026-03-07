@@ -60,25 +60,7 @@ public class RecordingService {
 
         return recordingRepository.save(rec);
     }
-    /*@Transactional
-    public Recording saveRecording(Long userId, RecordingRequest req) {
 
-        // Create DB row first
-        Recording rec = new Recording();
-        rec.setUserId(userId);
-        rec.setWord(req.getWord());
-        rec.setMeaning(req.getMeaning());
-
-        rec = recordingRepository.save(rec);
-
-        // Upload word using recording ID
-        String objectKey = "recordings/" + rec.getId() + "/word.webm";
-        String savedKey = storageService.put(userId, req.getFile(), objectKey);
-
-        rec.setWordObjectKey(savedKey);
-
-        return recordingRepository.save(rec);
-    }*/
     @Transactional
     public Recording updateSentence(
             Long recordingId,
@@ -108,77 +90,11 @@ public class RecordingService {
     }
 
 
-   /* //@Transactional
-    public Recording saveRecording(Long userId, RecordingRequest req) {
-        System.out.println("🔥 ENTERED saveRecording");
-        log.info("SERVICE UPLOAD: name={} type={} size={}",
-                req.getFile().getOriginalFilename(),
-                req.getFile().getContentType(),
-                req.getFile().getSize()
-        );
 
 
-        long now = System.currentTimeMillis();
-        String wordSafe = safe(req.getWord());   // or req.getMeaning()
-        String objectKey =
-                userId + "/" + now + "-" + wordSafe + "-" + now + ".webm";
-        storageService.put(userId, req.getFile(), objectKey);
-        Recording rec = new Recording();
-        rec.setUserId(userId);
-        rec.setWordObjectKey(objectKey);   // STORE MinIO key, NOT a file path
-        rec.setWord(req.getWord());
-        rec.setMeaning(req.getMeaning());
-        return recordingRepository.save(rec);
-    }*/
 
 
-    /*public Recording saveSentenceRecording(Long userId, RecordingRequest req) {
 
-        System.out.println("🔥 ENTERED saveSentenceRecording");
-        log.info("SERVICE UPLOAD: name={} type={} size={}",
-                req.getFile().getOriginalFilename(),
-                req.getFile().getContentType(),
-                req.getFile().getSize()
-        );
-
-
-        long now = System.currentTimeMillis();
-        String wordSafe = safe(req.getSentence());   // or req.getMeaning()
-        String objectKey =
-                userId + "/" + now + "-" + wordSafe + "-" + now + ".webm";
-        storageService.put(userId, req.getFile(), objectKey);
-        Recording rec = new Recording();
-        rec.setUserId(Math.toIntExact(userId));
-        rec.setWordObjectKey(objectKey);   // STORE MinIO key, NOT a file path
-        rec.setWord(req.getWord());
-        rec.setMeaning(req.getMeaning());
-        return recordingRepository.save(rec);
-
-    }*/
-   /* public Recording updateSentence(
-            Long recordingId,
-            Long userId,
-            String sentence,
-            String sentenceMeaning,
-            MultipartFile file
-    ) {
-        String objectKey = "sentence-" + recordingId + "-" + System.currentTimeMillis() + ".webm";
-        String savedKey =minioStorageService.putSentence(userId, file, objectKey);
-        //Long userId, MultipartFile file, String objectKey
-
-        Recording recording = recordingRepository
-                .findByIdAndUserId(recordingId, userId)
-                .orElseThrow(() -> new RuntimeException("Recording not found"));
-
-        // Upload to sentence bucket
-       // String objectKey = storageService.put(file);
-
-        recording.setSentence(sentence);
-        recording.setSentenceMeaning(sentenceMeaning);
-        recording.setSentenceObjectKey(objectKey);
-
-        return recordingRepository.save(recording);
-    }*/
 }
 
 

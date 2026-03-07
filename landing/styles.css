@@ -11,7 +11,7 @@ body {
     line-height: 1.6;
 }
 
-/* Navbar */
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -40,7 +40,7 @@ nav a.cta {
     color: white;
 }
 
-/* Hero */
+
 .hero {
     padding: 4rem 2rem;
     text-align: center;
@@ -62,7 +62,7 @@ nav a.cta {
     margin: 0 0.5rem;
 }
 
-/* Buttons */
+
 .btn {
     display: inline-block;
     padding: 0.8rem 1.6rem;
@@ -81,7 +81,7 @@ nav a.cta {
     color: #2e7d32;
 }
 
-/* Sections */
+
 .section {
     padding: 3rem 2rem;
     max-width: 900px;
@@ -97,7 +97,7 @@ nav a.cta {
     margin-bottom: 1.5rem;
 }
 
-/* Steps */
+
 .steps {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -110,7 +110,7 @@ nav a.cta {
     border-radius: 6px;
 }
 
-/* Values */
+
 .values {
     list-style: none;
     max-width: 500px;
@@ -121,7 +121,7 @@ nav a.cta {
     margin: 0.6rem 0;
 }
 
-/* Footer */
+
 footer {
     padding: 2rem;
     text-align: center;

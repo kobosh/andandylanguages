@@ -1,33 +1,39 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule,NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-register',
-  //standalone: true,
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './register.html',
   styleUrls: ['./register.css']
 })
 export class Register {
-
   name: string = '';
   email: string = '';
   password: string = '';
   error: string = '';
   success: string = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
-  register() {
-    //🔑 clear previous state
+  register(form: NgForm) {
     this.error = '';
     this.success = '';
 
-    this.http.post('http://localhost:8082/api/auth/register', {   // ✅ FIX
-      //name: this.name,
+    if (form.invalid) {
+      this.error = 'Please correct the errors above.';
+      return;
+    }
+
+    this.http.post('http://localhost:8082/api/auth/register', {
       email: this.email,
       password: this.password,
       name: this.name
@@ -44,5 +50,4 @@ export class Register {
       }
     });
   }
-
 }

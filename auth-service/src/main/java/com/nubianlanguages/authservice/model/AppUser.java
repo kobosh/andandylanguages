@@ -36,8 +36,9 @@ public class AppUser {
 
     public AppUser() {}
 
-    public AppUser(String email, String password, String role) {
-        //this.username = username;
+    public AppUser(String username,String email, String password, String role) {
+
+        this.fullname = username;
         this.email = email;
         this.password = password;
         this.role = role;

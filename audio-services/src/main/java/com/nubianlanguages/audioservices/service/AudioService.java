@@ -2,8 +2,10 @@ package com.nubianlanguages.audioservices.service;
 
 import com.nubianlanguages.audioservices.dto.UploadResponse;
 import io.minio.*;
-import io.minio.errors.*;
+
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +16,8 @@ import java.util.UUID;
 @Service
 public class AudioService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AudioService.class); //
+
     private final MinioClient minioClient;
 
     @Value("${minio.bucket.word}")
@@ -23,13 +27,13 @@ public class AudioService {
     private String minioUrl;
 
     public AudioService(MinioClient minioClient)
-    {   System.out.println("audio servic construct");
+    {   logger.info("audio servic construct");
         this.minioClient = minioClient;
     }
 
     @PostConstruct
     public void createBucketIfNotExists() {
-        System.out.println("AudioService: checking MinIO bucket");
+      logger.info("AudioService: checking MinIO bucket");
 
         try {
             boolean exists = minioClient.bucketExists(
@@ -44,16 +48,16 @@ public class AudioService {
                                 .bucket(bucketName)
                                 .build()
                 );
-                System.out.println("Bucket created: " + bucketName);
+               logger.info("Bucket created: {}" , bucketName);
             } else {
-                System.out.println("Bucket exists: " + bucketName);
+                logger.info("Bucket exists: {}" ,bucketName);
             }
 
         } catch (Exception e) {
             // 🚨 DO NOT FAIL STARTUP
-            System.err.println(
-                    "MinIO not ready at startup. Will retry on first request. Reason: "
-                            + e.getMessage()
+            logger.info(
+                    "MinIO not ready at startup. Will retry on first request. Reason:{} "
+                            , e.getMessage()
             );
         }
     }

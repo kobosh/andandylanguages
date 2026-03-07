@@ -68,7 +68,15 @@ services:
       - postgres
       - minio
       - auth-service
-
+  language-ui:
+    build: ./language-ui
+    container_name: language-ui
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      - auth-service
+      - audio-services
 volumes:
   pg_audio_data:
   auth_h2_data:

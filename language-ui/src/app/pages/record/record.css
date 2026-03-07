@@ -1,4 +1,4 @@
-/* Page */
+
 .page {
   max-width: 900px;
   margin: 0 auto;
@@ -7,7 +7,7 @@
   color: #1f2937;
 }
 
-/* Hero */
+
 .hero {
   text-align: center;
   margin-bottom: 2.5rem;
@@ -23,7 +23,7 @@
   font-size: 1.1rem;
 }
 
-/* Cards */
+
 .card {
   background: #ffffff;
   border-radius: 12px;
@@ -32,7 +32,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
-/* Instructions */
+
 .instructions h2 {
   margin-bottom: 1rem;
 }
@@ -45,7 +45,7 @@
   margin-bottom: 0.5rem;
 }
 
-/* Recorder */
+
 #waveform {
   height: 120px;
   margin-bottom: 1rem;
@@ -53,7 +53,7 @@
   border-radius: 8px;
 }
 
-/* Form */
+
 .form-row {
   display: flex;
   gap: 1rem;
@@ -67,7 +67,7 @@
   border: 1px solid #d1d5db;
 }
 
-/* Buttons */
+
 .controls,
 .actions {
   display: flex;
@@ -103,13 +103,13 @@
   color: white;
 }
 
-/* Audio */
+
 .audio-player {
   width: 100%;
   margin-top: 1rem;
 }
 
-/* Next step */
+
 .next-step p {
   color: #4b5563;
 }

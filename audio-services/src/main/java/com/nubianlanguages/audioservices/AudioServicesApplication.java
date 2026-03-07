@@ -15,13 +15,5 @@ public class AudioServicesApplication {
     }
 
 
-    /*@Bean
-    CommandLineRunner runAtStartup(MinioStorageService recordingService) {
-        return args -> {
-            //String objectKey = "1/1769388186997-koman-1769388186997.webm";
 
-            String url = recordingService.getminiourl(2L);
-            System.out.println(url);
-        };
-    }*/
 }

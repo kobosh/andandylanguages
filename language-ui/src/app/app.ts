@@ -12,6 +12,7 @@ import {IdleService} from './services/IdleService';
   styleUrls: ['./app.css']               // ⭐ FIXED ⭐
 })
 export class App implements OnInit{
+
   constructor(private idleService: IdleService) {}
   title = signal('language-ui');
   ngOnInit() {

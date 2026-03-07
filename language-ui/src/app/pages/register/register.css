@@ -27,3 +27,15 @@ button {
 .success {
   color: green;
 }
+
+.field-error {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+
+input.ng-invalid.ng-touched,
+input.ng-invalid.ng-dirty {
+  border: 1px solid red;
+}

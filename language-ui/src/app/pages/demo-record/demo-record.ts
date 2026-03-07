@@ -8,7 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 
 import WaveSurfer from 'wavesurfer.js';
-import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js' ;
 
 @Component({
   selector: 'app-demo-record',
@@ -40,6 +40,7 @@ export class DemoRecordComponent implements AfterViewInit {
   protected usageSentence: string='';
 
   ngAfterViewInit() {
+    //console.log('waveform native element:', this.waveform?.nativeElement);
     // ✅ create regions plugin
     this.regions = RegionsPlugin.create();
 

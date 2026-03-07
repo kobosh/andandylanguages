@@ -1,18 +1,53 @@
 <div class="register-container">
-
   <h2>Register</h2>
 
-  <p class="error" *ngIf="error">{{ error }}</p>
-  <p class="success" *ngIf="success">{{ success }}</p>
-  <input type="text" [(ngModel)]="name" placeholder="Full Name" required />
-  <!--<input [(ngModel)]="name" type="text" placeholder="Name">-->
-  <input [(ngModel)]="email" type="email" placeholder="Email">
-  <input [(ngModel)]="password" type="password" placeholder="Password">
+  <form #registerForm="ngForm" (ngSubmit)="register(registerForm)" novalidate>
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <p class="success" *ngIf="success">{{ success }}</p>
 
-  <button (click)="register()">Create Account</button>
+    <input
+      type="text"
+      name="name"
+      [(ngModel)]="name"
+      placeholder="Full Name"
+      required
+      #nameField="ngModel"
+    />
+    <div class="field-error" *ngIf="nameField.invalid && (nameField.touched || registerForm.submitted)">
+      Full name is required
+    </div>
 
-  <p>
-    Already have an account?
-    <a routerLink="/login">Login</a>
-  </p>
+    <input
+      type="email"
+      name="email"
+      [(ngModel)]="email"
+      placeholder="Email"
+      required
+      email
+      #emailField="ngModel"
+    />
+    <div class="field-error" *ngIf="emailField.invalid && (emailField.touched || registerForm.submitted)">
+      Enter a valid email
+    </div>
+
+    <input
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+      placeholder="Password"
+      required
+      minlength="6"
+      #passwordField="ngModel"
+    />
+    <div class="field-error" *ngIf="passwordField.invalid && (passwordField.touched || registerForm.submitted)">
+      Password must be at least 6 characters
+    </div>
+
+    <button type="submit">Create Account</button>
+
+    <p>
+      Already have an account?
+      <a routerLink="/login">Login</a>
+    </p>
+  </form>
 </div>

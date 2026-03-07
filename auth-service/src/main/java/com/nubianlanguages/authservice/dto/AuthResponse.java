@@ -1,14 +1,8 @@
 package com.nubianlanguages.authservice.dto;
 
-import lombok.Getter;
-
-@Getter
-public class AuthResponse {
-    private final String token;
-
-    public AuthResponse(String token) {
+public record AuthResponse(String token) {
+    public AuthResponse {
         System.out.println("in Authresponse");
-        this.token = token;
     }
 
 }

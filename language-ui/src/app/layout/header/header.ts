@@ -4,12 +4,7 @@ import {AuthService} from '../../services/auth.service';
 import { NgIf} from '@angular/common';
 
 
-/*@Component({
-  selector: 'app-header',
-  //standalone:true,
-  imports:[CommonModule],
-  templateUrl: './header.html'
-})*/
+
 @Component({
   selector: 'app-header',
   //standalone: true,

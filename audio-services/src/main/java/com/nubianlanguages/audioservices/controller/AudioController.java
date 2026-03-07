@@ -1,6 +1,6 @@
 package com.nubianlanguages.audioservices.controller;
 
-import com.nubianlanguages.audioservices.dto.UploadResponse;
+
 import com.nubianlanguages.audioservices.service.AudioService;
 import com.nubianlanguages.audioservices.service.AudioUploadService;
 import org.springframework.http.MediaType;
@@ -43,7 +43,7 @@ public class AudioController {
             resp.put("filename", filename);
 
             return ResponseEntity.ok(resp);
-           // return ResponseEntity.ok("Saved: " + filename);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,9 +51,6 @@ public class AudioController {
                     .body(Map.of( "Failed to save file: " ,e.getMessage()));
         }
 
-        // save to MinIO or disk here
-        //audioUploadService.upload(file);
 
-       // return ResponseEntity.ok("Uploaded: " + file.getOriginalFilename());
     }
 }
