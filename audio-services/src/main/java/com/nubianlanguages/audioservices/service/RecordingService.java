@@ -1,29 +1,33 @@
 package com.nubianlanguages.audioservices.service;
 
+import com.nubianlanguages.audioservices.dto.PracticeItemSummaryResponse;
 import com.nubianlanguages.audioservices.dto.RecordingRequest;
 import com.nubianlanguages.audioservices.entity.Recording;
 import com.nubianlanguages.audioservices.repository.RecordingRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;import java.io.IOException;
+import java.util.List;
 
 @Service
 @Slf4j
 public class RecordingService {
 
-   private final RecordingRepository  recordingRepository;
+    private final RecordingRepository recordingRepository;
     private final StorageService storageService;
-   private final MinioStorageService minioStorageService;
+    private final MinioStorageService minioStorageService;
 
     public RecordingService(RecordingRepository repo, StorageService storageService, MinioStorageService minioStorageService) {
         this.storageService = storageService;
-        this.recordingRepository=repo;
+        this.recordingRepository = repo;
         this.minioStorageService = minioStorageService;
     }
+
     private String safe(String value) {
         if (value == null || value.isBlank()) {
             return "unknown";
@@ -33,6 +37,7 @@ public class RecordingService {
                 .replaceAll("[^a-z0-9]", "-")
                 .replaceAll("-+", "-");
     }
+
     @Transactional
     public Recording saveRecording(Long userId, RecordingRequest req) {
 
@@ -90,13 +95,7 @@ public class RecordingService {
     }
 
 
-
-
-
-
-
 }
-
 
 
 

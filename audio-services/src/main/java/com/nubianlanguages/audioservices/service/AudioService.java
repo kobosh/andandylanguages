@@ -1,6 +1,9 @@
 package com.nubianlanguages.audioservices.service;
 
+import com.nubianlanguages.audioservices.dto.PracticeItemResponse;
+import com.nubianlanguages.audioservices.dto.PracticeItemSummaryResponse;
 import com.nubianlanguages.audioservices.dto.UploadResponse;
+import com.nubianlanguages.audioservices.repository.RecordingRepository;
 import io.minio.*;
 
 import jakarta.annotation.PostConstruct;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,10 +29,14 @@ public class AudioService {
 
     @Value("${minio.url}")
     private String minioUrl;
+    private  final RecordingRepository     recordingRepository;
 
-    public AudioService(MinioClient minioClient)
-    {   logger.info("audio servic construct");
+    public AudioService(MinioClient minioClient, RecordingRepository recordingRepository)
+    {
+        this.recordingRepository = recordingRepository;
+        logger.info("audio servic construct");
         this.minioClient = minioClient;
+
     }
 
     @PostConstruct
@@ -84,4 +92,32 @@ public class AudioService {
 
         return new UploadResponse(objectName, fileUrl);
     }
+    //pronunciatio
+  /*  public List<PracticeItemSummaryResponse> getPublishedItems() {
+        return recordingRepository.findByPublishedTrue()
+                .stream()
+                .map(rec -> new PracticeItemSummaryResponse(
+                        rec.getId(),
+                        rec.getWord(),
+                        rec.getMeaning()
+                ))
+                .toList();
+    }
+
+    public PracticeItemResponse getPublishedItem(Long id) {
+        Recording rec = recordingRepository.findByIdAndPublishedTrue(id)
+                .orElseThrow(() -> new RuntimeException("Practice item not found"));
+
+        return new PracticeItemResponse(
+                rec.getId(),
+                rec.getWord(),
+                rec.getMeaning(),
+                rec.getSentence(),
+                rec.getSentenceMeaning(),
+                wordbucket,
+                sentencebucket,
+                rec.getWordObjectKey(),
+                rec.getSentenceObjectKey()
+        );
+    }*/
 }

@@ -6,6 +6,7 @@ import com.nubianlanguages.authservice.model.AppUser;
 import com.nubianlanguages.authservice.repository.UserRepository;
 import com.nubianlanguages.authservice.security.JwtService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -31,7 +34,7 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping("/login")
+   /* @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
 
@@ -53,8 +56,45 @@ public class AuthController {
                         "expiresIn", expirationMs / 1000
                 )
         );
-    }
-    @PostMapping("/register")
+    }*/
+   @PostMapping("/login")
+   public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+       System.out.println("REQUEST ROLE: "+ request.getRole()+" PWD "+request.getPassword());
+
+       Optional<AppUser> optionalUser = userRepository.findByEmail(request.getEmail());
+
+       if (optionalUser.isEmpty()) {
+           return ResponseEntity
+                   .status(HttpStatus.UNAUTHORIZED)
+                   .body(Map.of("message", "Invalid email or password"));
+       }
+
+       AppUser user = optionalUser.get();
+
+       if (! request.getPassword().equals( user.getPassword()) ){
+           return ResponseEntity
+                   .status(HttpStatus.UNAUTHORIZED)
+                   .body(Map.of("message", "Invalid email or password"));
+       }
+
+       String token = jwtService.generateToken(
+               user.getId().toString(),
+               expirationMs,
+               user.getFullname()
+       );
+       if (request.getRole() != null) {
+           user.setRole(request.getRole());
+       }
+       return ResponseEntity.ok(
+               Map.of(
+                       "accessToken", token,
+                       "expiresIn", expirationMs / 1000,
+                       "role", user.getRole()
+               )
+       );
+   }
+
+   /* @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
         // 1️⃣ Validate input (minimal, but necessary)
@@ -100,7 +140,49 @@ public class AuthController {
         );
 
 
-    }
+    }*/
+   @PostMapping("/register")
+   public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+
+       if (request.getEmail() == null || request.getPassword() == null) {
+           return ResponseEntity.badRequest().body("Email and password are required");
+       }
+
+       if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+           return ResponseEntity.status(409).body("Email already exists");
+       }
+
+       AppUser user = new AppUser();
+       user.setEmail(request.getEmail());
+       user.setPassword(request.getPassword());
+
+       if (request.getName() != null) {
+           user.setFullname(request.getName());
+       }
+
+       // ✅ SET ROLE (IMPORTANT)
+       if (request.getRole() != null) {
+           user.setRole(request.getRole());
+       } else {
+           user.setRole("learner"); // default
+       }
+
+       userRepository.save(user);
+
+       String token = jwtService.generateToken(
+               user.getId().toString(),
+               expirationMs,
+               user.getFullname()
+       );
+
+       return ResponseEntity.status(201).body(
+               Map.of(
+                       "accessToken", token,
+                       "expiresIn", expirationMs / 1000,
+                       "role", user.getRole()   // optional
+               )
+       );
+   }
 
 }
 

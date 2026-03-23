@@ -1,0 +1,13 @@
+<div class="word-list-page">
+  <h2>Listen to Words</h2>
+
+  <p *ngIf="loading">Loading...</p>
+  <p *ngIf="error">{{ error }}</p>
+
+  <div *ngFor="let item of words" class="word-card">
+    <h3>{{ item.word }}</h3>
+    <p>{{ item.meaning }}</p>
+
+    <audio controls [src]="item.audioUrl"></audio>
+  </div>
+</div>

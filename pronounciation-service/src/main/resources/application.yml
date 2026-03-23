@@ -1,0 +1,39 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: pronunciation-service
+
+  datasource:
+    url: jdbc:h2:file:./data/prondb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+vosk:
+      model-path: C:/users/kokob/vox/vosk-model-small-en-us-0.15
+
+#azure:
+#  speech:
+#    key: 3f4c7e7c3b9a4c7e8c7a8f3b9a4c7e8c
+#    #region: ${AZURE_SPEECH_REGION:}
+#    #language: ${AZURE_SPEECH_LANGUAGE:en-US}
+#    region: eastus
+#    language: en-US
+
+app:
+  cors:
+    allowed-origins: http://localhost:4200

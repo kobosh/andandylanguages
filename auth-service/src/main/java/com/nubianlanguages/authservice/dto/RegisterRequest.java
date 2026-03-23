@@ -20,6 +20,9 @@ public class RegisterRequest {
 
     private String name;
     @NotBlank
+
+    private String role;
+    @NotBlank
     @Size(min = 6)
     private String password;
 

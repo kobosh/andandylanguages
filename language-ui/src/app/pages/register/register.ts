@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { FormsModule,NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router ,ActivatedRoute} from '@angular/router';
+
 
 
 @Component({
@@ -12,18 +13,27 @@ import { Router } from '@angular/router';
   templateUrl: './register.html',
   styleUrls: ['./register.css']
 })
-export class Register {
+export class Register implements OnInit{
   name: string = '';
   email: string = '';
   password: string = '';
   error: string = '';
   success: string = '';
+  role:string='';
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.role = params['role'] || '';
+      console.log('ROLE FROM URL:', this.role);
+    });
+  }
   register(form: NgForm) {
     this.error = '';
     this.success = '';
@@ -36,13 +46,24 @@ export class Register {
     this.http.post('http://localhost:8082/api/auth/register', {
       email: this.email,
       password: this.password,
-      name: this.name
+      name: this.name,
+      role: this.role
     }).subscribe({
       next: () => {
+
         this.success = 'Registration successful! Redirecting...';
 
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          if (this.role === 'contrib') {
+            console.log(this.role+"  demo record");
+            this.router.navigate(['/demo-record']);
+           }
+
+          else if (this.role === 'learner') {
+            this.router.navigate(['/login'], {
+              queryParams: { role: 'learner' }
+            });}
+
         }, 1500);
       },
       error: () => {

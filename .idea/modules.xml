@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/andandylanguages.iml" filepath="$PROJECT_DIR$/andandylanguages.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pronounciation-service/pronounciation-service.iml" filepath="$PROJECT_DIR$/pronounciation-service/pronounciation-service.iml" />
     </modules>
   </component>
 </project>
