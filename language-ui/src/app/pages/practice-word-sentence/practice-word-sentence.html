@@ -1,0 +1,85 @@
+<div *ngIf="item" class="card">
+
+  <h3>Practice</h3>
+
+  <p>
+    <strong>Word:</strong> {{ item.word }}
+  </p>
+
+  <p>
+    <strong>Meaning:</strong> {{ item.meaning }}
+  </p>
+
+  <p *ngIf="item.sentence">
+    <strong>Sentence:</strong> {{ item.sentence }}
+  </p>
+
+  <p *ngIf="item.sentenceMeaning">
+    <strong>Sentence Meaning:</strong> {{ item.sentenceMeaning }}
+  </p>
+
+  <p>
+    <strong>Author:</strong> {{ item.author }}
+  </p>
+  <p>Current index: {{ currentIndex }}</p>
+  <!-- AUDIO CONTROLS -->
+  <div class="actions">
+    <button (click)="playWord()">▶ Play Word</button>
+    <button (click)="playSentence()">▶ Play Sentence</button>
+  </div>
+
+  <!-- LOADING -->
+<!--  <div *ngIf="isLoadingAudio" class="loading">-->
+<!--    {{ loadingMessage }}-->
+<!--  </div>-->
+  <app-loading-spinner
+    *ngIf="isLoadingAudio"
+    [message]="'Loading audio... please wait'"
+  ></app-loading-spinner>
+
+  <app-loading-spinner
+    *ngIf="isPreparingTranscript"
+    [message]="'Preparing transcript... please wait'"
+  ></app-loading-spinner>
+
+  <!-- NOW PLAYING -->
+  <div *ngIf="nowPlaying" class="info">
+    Now playing: {{ nowPlaying }}
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+
+
+  <!-- RECORD CHOICE -->
+  <div class="actions">
+    <button (click)="readyWord.emit()">
+      🎤 I am ready to say the word
+    </button>
+
+    <button (click)="readySentence.emit()">
+      🗣 I am ready to say the sentence
+    </button>
+  </div>
+
+  <hr />
+
+  <!-- NAVIGATION -->
+  <div class="actions">
+    <button (click)="prev.emit()" [disabled]="currentIndex === 0">
+      ⬅ Previous
+    </button>
+
+    <button (click)="next.emit()">
+      Next ➡
+    </button>
+  </div>
+
+</div>
+
+<div *ngIf="!item">
+  <p>No item selected.</p>
+</div>

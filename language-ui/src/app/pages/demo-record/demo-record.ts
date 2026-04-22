@@ -1,23 +1,25 @@
 import {
-  Component,
+  Component,OnInit,
+
   AfterViewInit,
   ViewChild,
   ElementRef
 
 } from '@angular/core';
+import {ActivatedRoute,RouterModule} from '@angular/router';
 import { CommonModule } from '@angular/common';
-
+//import { ActivatedRoute} from '@angular/core'
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js' ;
 
 @Component({
   selector: 'app-demo-record',
   standalone: true,
-  imports:[ CommonModule],
+  imports:[ CommonModule,RouterModule],
   templateUrl: './demo-record.html',
   styleUrls: ['./demo-record.css']
 })
-export class DemoRecordComponent implements AfterViewInit {
+export class DemoRecordComponent implements AfterViewInit,OnInit {
   hasRecorded = false;
   hasSelectedRegion = false;
   hasTrimmed = false;
@@ -38,6 +40,15 @@ export class DemoRecordComponent implements AfterViewInit {
 
   isRecording = false;
   protected usageSentence: string='';
+  role = '';
+
+  constructor(private readonly route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.role = params['role'] || 'contrib';
+    });
+  }
 
   ngAfterViewInit() {
     //console.log('waveform native element:', this.waveform?.nativeElement);

@@ -1,0 +1,25 @@
+<!-- practice-word-list.html -->
+
+<div *ngIf="viewMode === 'practice'">
+
+  <app-practice-word-sentence
+    [item]="selectedWord"
+    [isWordMode]="isWordMode"
+    (readyWord)="onReadyWord()"
+    [currentIndex]="currentIndex"
+    (readySentence)="onReadySentence()"
+    (next)="goToNext()"
+    (prev)="goToPrevious()"
+  ></app-practice-word-sentence>
+
+</div>
+
+<div *ngIf="viewMode === 'assess'">
+
+  <app-assessment
+    [item]="selectedWord"
+    [isWordMode]="isWordMode"
+    (back)="onBackToPractice()"
+  ></app-assessment>
+
+</div>

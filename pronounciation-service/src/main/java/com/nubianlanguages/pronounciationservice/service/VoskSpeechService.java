@@ -13,8 +13,108 @@ import javax.sound.sampled.AudioSystem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 @Service
+public class VoskSpeechService {
+
+    @Value("${vosk.model-path}")
+    private String modelPath;
+
+    private Model model;
+
+    @PostConstruct
+    public void init() throws IOException {
+        File dir = new File(modelPath);
+        if (!dir.exists() || !dir.isDirectory()) {
+            throw new IllegalStateException("Vosk model path does not exist: " + modelPath);
+        }
+
+        this.model = new Model(modelPath);
+        System.out.println("Vosk model loaded from: " + modelPath);
+    }
+
+    @PreDestroy
+    public void destroy() {
+        if (model != null) {
+            model.close();
+        }
+    }
+
+   /* public String recognizeOpen(File wavFile) throws Exception {
+        try (AudioInputStream ais = AudioSystem.getAudioInputStream(wavFile)) {
+
+            AudioFormat format = ais.getFormat();
+           // AudioFormat format = ais.getFormat();
+            System.out.println("Sample rate: " + format.getSampleRate());
+            System.out.println("Channels: " + format.getChannels());
+            System.out.println("Encoding: " + format.getEncoding());
+            System.out.println("Frame size: " + format.getFrameSize());
+
+            Recognizer recognizer = new Recognizer(model, format.getSampleRate());
+
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+
+            while ((bytesRead = ais.read(buffer)) >= 0) {
+                recognizer.acceptWaveForm(buffer, bytesRead);
+            }
+
+           // String finalResult = recognizer.getFinalResult();
+            String finalResult = recognizer.getFinalResult();
+            System.out.println("VOSK FINAL RESULT = " + finalResult);
+           // recognizer.close();
+
+           // return extractText(finalResult);
+            recognizer.close();
+
+            return extractText(finalResult);
+        }
+    }*/
+   public String recognizeOpen(File wavFile) throws Exception {
+       try (AudioInputStream ais = AudioSystem.getAudioInputStream(wavFile)) {
+           AudioFormat format = ais.getFormat();
+
+           System.out.println("Sample rate: " + format.getSampleRate());
+           System.out.println("Channels: " + format.getChannels());
+           System.out.println("Encoding: " + format.getEncoding());
+           System.out.println("Frame size: " + format.getFrameSize());
+
+           Recognizer recognizer = new Recognizer(model, format.getSampleRate());
+
+           byte[] buffer = new byte[4096];
+           int bytesRead;
+
+           while ((bytesRead = ais.read(buffer)) != -1) {
+               if (bytesRead > 0) {
+                   boolean accepted = recognizer.acceptWaveForm(buffer, bytesRead);
+                   if (accepted) {
+                       System.out.println("VOSK RESULT = " + recognizer.getResult());
+                   } else {
+                       System.out.println("VOSK PARTIAL = " + recognizer.getPartialResult());
+                   }
+               }
+           }
+
+           String finalResult = recognizer.getFinalResult();
+           System.out.println("VOSK FINAL RESULT = " + finalResult);
+
+           recognizer.close();
+           return extractText(finalResult);
+       }
+   }
+
+    private String extractText(String json) {
+        if (json == null || json.isBlank()) return "";
+        int idx = json.indexOf("\"text\"");
+        if (idx == -1) return "";
+        int colon = json.indexOf(":", idx);
+        int firstQuote = json.indexOf("\"", colon + 1);
+        int secondQuote = json.indexOf("\"", firstQuote + 1);
+        if (firstQuote == -1 || secondQuote == -1) return "";
+        return json.substring(firstQuote + 1, secondQuote);
+    }
+}
+
+/*@Service
 public class VoskSpeechService {
     @Value("${vosk.model-path}")
     private String modelPath;
@@ -124,7 +224,7 @@ public class VoskSpeechService {
 
                 return extractText(finalJson);
             }
-        }*/
+        }
 
         private String extractText(String json) {
             if (json == null || json.isBlank()) {
@@ -146,4 +246,4 @@ public class VoskSpeechService {
 
             return json.substring(firstQuote + 1, secondQuote).trim();
         }
-    }
+    }*/

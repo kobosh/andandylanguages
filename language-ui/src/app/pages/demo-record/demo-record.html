@@ -1,8 +1,10 @@
 <div class="demo-box" >
   <div>
 
-  <h3>🎧 Practice Recording Or login to  record a word</h3>
-    <a href="/login">Log in</a>
+  <h3>🎧 Practice Recording Or login to  record a word </h3>
+    <a [routerLink]="['/login']" [queryParams]="{ role: role }">
+      Log in to record audio
+    </a>
     <p class="hint">
       this is how  recorded audio  will look like</p>
       <img src="/images/recordedaudio.png" alt=" not found">

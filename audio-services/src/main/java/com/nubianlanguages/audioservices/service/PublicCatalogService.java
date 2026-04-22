@@ -7,17 +7,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @Service
 public class PublicCatalogService {
 
     private final RecordingRepository recordingRepository;
-    private final MinioStorageService minioStorageService;
 
-    public PublicCatalogService(RecordingRepository recordingRepository,
-                                MinioStorageService minioStorageService) {
+    public PublicCatalogService(RecordingRepository recordingRepository) {
         this.recordingRepository = recordingRepository;
-        this.minioStorageService = minioStorageService;
     }
 
     public List<PublicWordResponse> getPublicWords() {
@@ -29,19 +25,14 @@ public class PublicCatalogService {
                 continue;
             }
 
-            try {
-                String audioUrl = minioStorageService.getWordUrl(rec.getId());
+            String audioUrl = "http://localhost:8083/api/recordings/" + rec.getId() + "/word-audio";
 
-                result.add(new PublicWordResponse(
-                        rec.getId(),
-                        rec.getWord(),
-                        rec.getMeaning(),
-                        audioUrl
-                ));
-            } catch (Exception e) {
-                // skip broken audio entries instead of failing entire response
-                System.err.println("Failed to build public word for recording id=" + rec.getId() + ": " + e.getMessage());
-            }
+            result.add(new PublicWordResponse(
+                    rec.getId(),
+                    rec.getWord(),
+                    rec.getMeaning(),
+                    audioUrl
+            ));
         }
 
         return result;

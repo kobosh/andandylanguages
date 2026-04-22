@@ -2,6 +2,7 @@ package com.nubianlanguages.audioservices.service;
 
 import com.nubianlanguages.audioservices.dto.PracticeItemSummaryResponse;
 import com.nubianlanguages.audioservices.dto.RecordingRequest;
+import com.nubianlanguages.audioservices.entity.Dialect;
 import com.nubianlanguages.audioservices.entity.Recording;
 import com.nubianlanguages.audioservices.repository.RecordingRepository;
 
@@ -51,23 +52,25 @@ public class RecordingService {
         rec.setUserId(userId);
         rec.setWord(req.getWord());
         rec.setMeaning(req.getMeaning());
+        rec.setAuthorName(req.getAuthorName());
         // rec.setCreatedAt(LocalDateTime.now()); // only if you don't use @CreationTimestamp
 
-        rec = recordingRepository.save(rec);
+       rec = recordingRepository.save(rec);
 
         // 2) Upload word using recording ID
         String objectKey = "recordings/" + rec.getId() + "/word.webm";
-        String savedKey = storageService.put(userId, file, objectKey);
+        String savedKey = storageService.putWord(userId, file, objectKey);
 
         // 3) Update DB with uploaded info
         rec.setWordObjectKey(savedKey);
         rec.setWordUploaded(true);
-
+        rec.setDialect(Dialect.valueOf(req.getDialect()));
         return recordingRepository.save(rec);
     }
 
     @Transactional
     public Recording updateSentence(
+
             Long recordingId,
             Long userId,
             String sentence,
@@ -90,6 +93,7 @@ public class RecordingService {
         recording.setSentenceMeaning(sentenceMeaning);
         recording.setSentenceObjectKey(savedKey);
         recording.setSentenceUploaded(true);
+
 
         return recordingRepository.save(recording);
     }

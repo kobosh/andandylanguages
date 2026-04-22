@@ -21,7 +21,8 @@ public class Recording {
 
     @Column(nullable = false)
     private Long userId;
-
+    @Column(nullable = false)
+    private String authorName="some user";
     @Column(nullable = false)
     private String word;
 
@@ -47,4 +48,7 @@ public class Recording {
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Dialect dialect = Dialect.DONGOLAWI;
 }

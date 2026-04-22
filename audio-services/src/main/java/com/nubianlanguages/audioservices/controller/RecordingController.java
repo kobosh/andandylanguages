@@ -1,12 +1,14 @@
 package com.nubianlanguages.audioservices.controller;
 
-import com.nubianlanguages.audioservices.dto.RecordingRequest;
-import com.nubianlanguages.audioservices.dto.RecordingResponse;
+import com.nubianlanguages.audioservices.dto.*;
 import com.nubianlanguages.audioservices.entity.Recording;
 import com.nubianlanguages.audioservices.repository.RecordingRepository;
 import com.nubianlanguages.audioservices.service.MinioStorageService;
+import com.nubianlanguages.audioservices.service.PronunciationAssessmentService;
 import com.nubianlanguages.audioservices.service.RecordingService;
 import com.nubianlanguages.audioservices.service.StorageService;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -20,60 +22,129 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.InputStream;
+import java.util.List;
+import  com.nubianlanguages.audioservices.dto.PracticeWordResponse;
+
 @RestController
 @RequestMapping("/api/recordings")
 @Slf4j
 public class RecordingController {
 
+
     private final MinioStorageService minioStorageService;
     private final RecordingService recordingService;
     private final RecordingRepository recordingRepository;
     private final StorageService storageService;
+    private final  PronunciationAssessmentService  pronunciationAssessmentService;
 
+    @Value("${minio.bucket.word}")
+    private String wordbucket;
+    @PostConstruct
+    public void testBucket() {
+        System.out.println("wordbucket = " + wordbucket);
+    }
     public RecordingController(
             MinioStorageService minioStorageService,
             RecordingService recordingService,
             RecordingRepository recordingRepository,
-            StorageService storageService
+            StorageService storageService, PronunciationAssessmentService pronunciationAssessmentService
     ) {
         this.minioStorageService = minioStorageService;
         this.recordingService = recordingService;
         this.recordingRepository = recordingRepository;
         this.storageService = storageService;
+        this.pronunciationAssessmentService = pronunciationAssessmentService;
     }
+
+
 
     // 🎧 STREAM WORD or SENTENCE
     // GET /api/recordings/{id}/stream?type=WORD
+    @GetMapping("/practice-words")
+    public List<PracticeWordResponse> getPracticeWords() {
 
-    @GetMapping("/{id}/stream")
-    public ResponseEntity<StreamingResponseBody> stream(
+        List<Recording> recordings = recordingRepository.findAll();
+
+        return recordings.stream()
+
+                .map(r -> new PracticeWordResponse(
+                        r.getId(),
+                        r.getWord(),
+                        r.getMeaning(),
+                        "/api/recordings/" + r.getId() + "/stream-word",
+                        r.getSentence(),
+                        r.getSentenceMeaning(),
+
+                        "/api/recordings/" + r.getId() + "/stream-sentence",
+                        r.getAuthorName()
+                ))
+                .toList();
+    }
+
+    @GetMapping("/{id}/stream-word")
+    public ResponseEntity<StreamingResponseBody> streamWord(
             @PathVariable Long id,
-            @RequestParam(defaultValue = "WORD") String type,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestParam(defaultValue = "WORD") String type
     ) {
-        Long userId = Long.parseLong(jwt.getSubject());
 
-        Recording rec = recordingRepository.findByIdAndUserId(id, userId)
+        Recording rec = recordingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recording not found"));
 
-        InputStream inputStream;
-        if ("SENTENCE".equalsIgnoreCase(type)) {
-            inputStream = minioStorageService.getSentence(rec.getSentenceObjectKey());
-        } else {
-            inputStream = minioStorageService.get(rec.getWordObjectKey());
+        String objectKey;
+        InputStream input;
+
+
+        try {
+            if ("WORD".equalsIgnoreCase(type)) {
+                objectKey = rec.getWordObjectKey();
+                input = storageService.getWord(objectKey);
+            } else {
+                objectKey = rec.getSentenceObjectKey();
+                input = storageService.getSentence(objectKey);
+            }
+
+            StreamingResponseBody body = outputStream -> {
+                input.transferTo(outputStream);
+            };
+            System.out.println("Streaming type=" + type);
+            System.out.println("objectKey=" + objectKey);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType("audio/webm"))
+                    .body(body);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to stream audio", e);
+        }
+    }
+    @GetMapping("/{id}/stream-sentence")
+    public ResponseEntity<StreamingResponseBody> streamSentence(@PathVariable Long id,
+                                                                @RequestParam(defaultValue = "WORD") String type) {
+        Recording rec = recordingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recording not found"));
+        String objectKey;
+        InputStream input;
+
+        try {
+            if ("SENTENCE".equalsIgnoreCase(type)) {
+                objectKey = rec.getWordObjectKey();
+                input = storageService.getSentence(objectKey);
+            } else {
+                objectKey = rec.getSentenceObjectKey();
+                input = storageService.getSentence(objectKey);
+            }
+            StreamingResponseBody body = outputStream -> {
+                input.transferTo(outputStream);
+            };
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType("audio/webm"))
+                    .body(body);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to stream audio", e);
         }
 
-        StreamingResponseBody stream = outputStream -> {
-            try (inputStream) {
-                inputStream.transferTo(outputStream);
-            }
-        };
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, "audio/webm")
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
-                .body(stream);
     }
+
 
     // ⬆️ UPLOAD WORD (creates the record)
     @PostMapping(value = "/upload-word", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -81,6 +152,8 @@ public class RecordingController {
             @RequestParam("word") String word,
             @RequestParam("meaning") String meaning,
             @RequestParam("file") MultipartFile file,
+            @RequestParam("authorname")  String authorName,
+            @RequestParam("dialect")  String dialect,
             @AuthenticationPrincipal Jwt jwt
     ) {
         Long userId = Long.parseLong(jwt.getSubject());
@@ -92,9 +165,11 @@ public class RecordingController {
         req.setWord(word);
         req.setMeaning(meaning);
         req.setFile(file);
+        req.setAuthorName(authorName);
+        req.setDialect(dialect);
 
         Recording saved = recordingService.saveRecording(userId, req);
-
+System.out.println("record id: "+saved.getId());//this prints id correctly
         return ResponseEntity.ok(
                 new RecordingResponse(
                         saved.getId(),
@@ -109,6 +184,7 @@ public class RecordingController {
     // ⬆️ UPLOAD SENTENCE (updates existing record)
     @PostMapping(value = "/upload-sentence", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadSentence(
+
             @RequestParam("recordingId") Long recordingId,
             @RequestParam("sentence") String sentence,
             @RequestParam("sentenceMeaning") String sentenceMeaning,
@@ -143,14 +219,15 @@ public class RecordingController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "WORD") String type,
             @AuthenticationPrincipal Jwt jwt
-    ) throws Exception {
-
-        // optional security improvement: ensure user owns recording
+    ) {
         Long userId = Long.parseLong(jwt.getSubject());
-        recordingRepository.findByIdAndUserId(id, userId)
+
+        Recording rec = recordingRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new RuntimeException("Recording not found"));
 
-        String url = minioStorageService.getUrl(id, type);
+        String objectKey = resolveObjectKey(rec, type);
+        String url = minioStorageService.getUrl(objectKey, type);
+
         return ResponseEntity.ok(url);
     }
     private String resolveObjectKey(Recording rec, String type) {
@@ -165,6 +242,21 @@ public class RecordingController {
             throw new RuntimeException("Word audio not uploaded yet");
         }
         return rec.getWordObjectKey();
+    }
+    @PostMapping(value = "/assess", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> assessLearnerAudio(
+            @RequestParam("recordingId") Long recordingId,
+            @RequestParam("mode") String mode, // WORD or SENTENCE
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        Long userId = Long.parseLong(jwt.getSubject());
+
+
+        AssessmentResponse response =
+                pronunciationAssessmentService.assess(recordingId, userId, mode, file);
+
+        return ResponseEntity.ok(response);
     }
 }
 

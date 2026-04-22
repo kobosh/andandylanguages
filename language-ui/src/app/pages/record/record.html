@@ -1,23 +1,35 @@
 <div class="page">
 
-  <!-- HERO -->
-  <section class="hero">
-    <h2 *ngIf="fullName">👋 Welcome, {{ fullName }}!</h2>
+  <h2 *ngIf="fullName">👋 Welcome, {{ fullName }}!</h2>
 
-    <h3 *ngIf="isWordMode">📝 Step 1: Record Word</h3>
-    <h3 *ngIf="!isWordMode">📖 Step 2: Record Sentence</h3>
+  <div class="form-field">
+    <label>Dialect</label>
 
-    <p>
-      Help preserve the language by recording a clear pronunciation.
+    <select [(ngModel)]="dialect" name="dialect" >
+      <option [ngValue]="null">-- Select Dialect --</option>
+      <option *ngFor="let d of dialects" [value]="d">{{ d }}</option>
+    </select>
+
+  </div>
+
+  <section class="hero" *ngIf="dialect">
+
+    <h3 *ngIf= "isWordMode">📝 Contributor: Record Word</h3>
+    <h3 *ngIf="!isWordMode">📖 Contributor: Record Sentence</h3>
+
+
+    <p >
+      Help preserve the language by recording a clear reference pronunciation.
       Trim the audio and upload when ready.
     </p>
+
+
   </section>
 
-  <!-- INSTRUCTIONS (step-aware) -->
-  <section class="card instructions">
+  <section class="card instructions" >
     <h2>How it works</h2>
 
-    <ol *ngIf="isWordMode">
+    <ol *ngIf="isContributor && isWordMode">
       <li>Type the <strong>Word</strong> and <strong>Word meaning</strong></li>
       <li>Click <strong>Record</strong> and say the word clearly</li>
       <li>Click <strong>Stop</strong> when finished</li>
@@ -27,7 +39,7 @@
       <li>Click <strong>Upload Word</strong></li>
     </ol>
 
-    <ol *ngIf="!isWordMode">
+    <ol *ngIf="isContributor && !isWordMode">
       <li>Type a short <strong>Sentence</strong> using the word</li>
       <li>Type the <strong>Sentence meaning</strong></li>
       <li>Click <strong>Record</strong> and read the sentence clearly</li>
@@ -35,57 +47,61 @@
       <li>Select a region and click <strong>Trim</strong></li>
       <li>Click <strong>Upload Sentence</strong></li>
     </ol>
-  </section>
 
-  <!-- ONE INPUT SET (used for both steps) -->
-  <div class="word-form">
 
-    <div class="form-field">
-      <label>
-        {{ isWordMode ? 'Word' : 'Sentence' }}
-      </label>
 
-      <input
-        type="text"
-        [(ngModel)]="text"
-        name="text"
-        [placeholder]="isWordMode ? 'Enter the word' : 'Enter a short sentence using the word'"
-      />
+    <div class="word-form">
+
+      <div class="form-field">
+        <label>{{ isWordMode ? 'Word' : 'Sentence' }}</label>
+
+        <input
+          type="text"
+          [(ngModel)]="text"
+          name="text"
+          required
+          #textModel="ngModel"
+          [class.error-input]="textModel.invalid && textModel.touched"
+          [placeholder]="isWordMode ? 'Enter the word' : 'Enter the sentence to practice'"
+        />
+
+        <div class="error" *ngIf="textModel.invalid && textModel.touched">
+          {{ isWordMode ? 'Word is required' : 'Sentence is required' }}
+        </div>
+      </div>
+
+      <div class="form-field" *ngIf="isContributor">
+        <label>{{ isWordMode ? 'Word Meaning' : 'Sentence Meaning' }}</label>
+
+        <input
+          type="text"
+          [(ngModel)]="meaningText"
+          name="meaningText"
+          required
+          #meaningModel="ngModel"
+          [class.error-input]="meaningModel.invalid && meaningModel.touched"
+          [placeholder]="isWordMode ? 'Enter the meaning' : 'Enter the meaning of the sentence'"
+        />
+
+        <div class="error" *ngIf="meaningModel.invalid && meaningModel.touched">
+          Meaning is required
+        </div>
+      </div>
+
     </div>
-
-    <div class="form-field">
-      <label>
-        {{ isWordMode ? 'Word Meaning' : 'Sentence Meaning' }}
-      </label>
-
-      <input
-        type="text"
-        [(ngModel)]="meaningText"
-        name="meaningText"
-        [placeholder]="isWordMode ? 'Enter the meaning' : 'Enter the meaning of the sentence'"
-      />
-    </div>
-
-  </div>
-
-  <section class="card recorder">
-
-    <!-- Waveform -->
+    <section class="card recorder" >
     <div #waveformContainer class="waveform"></div>
 
-    <!-- Now playing indicator -->
     <div class="now-playing" *ngIf="nowPlaying">
       ▶ Now playing: <strong>{{ nowPlaying }}</strong>
     </div>
 
-    <!-- Controls -->
     <div class="controls">
       <button class="btn primary" (click)="start()">Record</button>
       <button class="btn danger" (click)="stop()">Stop</button>
       <button class="btn secondary" (click)="reset()">Repeat</button>
     </div>
 
-    <!-- Playback -->
     <button class="btn secondary" [disabled]="!recordedBlob" (click)="playOriginal()">
       ▶ Play Original
     </button>
@@ -94,28 +110,28 @@
       ▶ Play Trimmed
     </button>
 
-    <!-- Actions -->
     <div class="actions">
       <button class="btn secondary" [disabled]="!recordedBlob || !hasRegion" (click)="trimOnly()">
         Trim
       </button>
 
-      <!-- ONE UPLOAD BUTTON (step-aware) -->
       <button
+        *ngIf="isContributor"
         class="btn success"
         [disabled]="!trimmedBlob || uploading || !text || !meaningText"
-        (click)="uploadTrimmedCompressed()"
+        (click)="submitAudio()"
       >
         {{ isWordMode ? 'Upload Word' : 'Upload Sentence' }}
       </button>
+
+
     </div>
 
-  </section>
 
-  <section>
-    <button (click)="playFromServer(1)">
-      ▶️ Play from server
-    </button>
-  </section>
+      <div *ngIf="isUploading" class="spinner-container">
+        <div class="spinner"></div>
+        <p>uploading ... please wait</p>
+      </div>
 
-</div>
+
+    </section>

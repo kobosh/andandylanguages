@@ -59,7 +59,7 @@ public class AuthController {
     }*/
    @PostMapping("/login")
    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-       System.out.println("REQUEST ROLE: "+ request.getRole()+" PWD "+request.getPassword());
+
 
        Optional<AppUser> optionalUser = userRepository.findByEmail(request.getEmail());
 
@@ -82,9 +82,11 @@ public class AuthController {
                expirationMs,
                user.getFullname()
        );
-       if (request.getRole() != null) {
-           user.setRole(request.getRole());
-       }
+//       if (request.getRole() != null) {
+//           user.setRole(request.getRole());
+//       }
+       System.out.println("AuthController login  info: "+" role "+ user.getRole()+" email "+
+               user.getEmail()+" PWD "+user.getPassword());
        return ResponseEntity.ok(
                Map.of(
                        "accessToken", token,
@@ -174,12 +176,14 @@ public class AuthController {
                expirationMs,
                user.getFullname()
        );
+       String role= user.getRole();
+System.out.println("ROLE in register "+role);
 
        return ResponseEntity.status(201).body(
                Map.of(
                        "accessToken", token,
                        "expiresIn", expirationMs / 1000,
-                       "role", user.getRole()   // optional
+                       "role", role  // optional
                )
        );
    }

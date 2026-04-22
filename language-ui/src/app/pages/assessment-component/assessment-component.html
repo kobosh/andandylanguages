@@ -1,0 +1,59 @@
+<div *ngIf="item" class="card">
+  <h3 *ngIf="isWordMode">Practice Recording: Word</h3>
+  <h3 *ngIf="!isWordMode">Practice Recording: Sentence</h3>
+
+  <p>
+    Current item:
+    <strong>{{ isWordMode ? item.word : item.sentence }}</strong>
+  </p>
+
+  <p *ngIf="isWordMode">
+    Expected meaning: {{ item.meaning }}
+  </p>
+
+  <p *ngIf="!isWordMode">
+    Expected meaning: {{ item.sentenceMeaning }}
+  </p>
+
+  <div class="actions">
+    <button (click)="start()">Record</button>
+    <button (click)="stop()">Stop</button>
+    <button (click)="playOriginal()" [disabled]="!recordedBlob">Play Original</button>
+    <button (click)="trimOnly()" [disabled]="!recordedBlob">Trim</button>
+    <button (click)="playTrimmed()" [disabled]="!trimmedBlob">Play Trimmed</button>
+  </div>
+
+  <div #waveformContainer class="waveform"></div>
+
+  <div class="actions">
+
+    <button (click)="assess()" [disabled]="assessmentLoading">
+      {{ assessmentLoading ? 'Assessing...' : 'Assess' }}
+    </button>
+    <button (click)="back.emit()">Back</button>
+  </div>
+
+  <div *ngIf="assessmentError" class="error">
+    {{ assessmentError }}
+  </div>
+  <div *ngIf="assessmentLoading" class="spinner-container">
+    <div class="spinner"></div>
+    <p>assessing... please wait</p>
+  </div>
+  <div *ngIf="assessmentResult" class="assessment-result">
+    <h4>Assessment Result</h4>
+    <p><strong>Expected:</strong> {{ assessmentResult?.expectedText }}</p>
+<!--    <p><strong>Expected:</strong> {{ isWordMode ? item.word : item.sentence }}</p>-->
+    <p><strong>Recognized:</strong> {{ assessmentResult.recognizedText }}</p>
+    <p><strong>Accuracy:</strong> {{ assessmentResult.accuracyScore }}</p>
+    <p><strong>Completeness:</strong> {{ assessmentResult.completenessScore }}</p>
+    <p><strong>Overall:</strong> {{ assessmentResult.overallScore }}</p>
+
+    <div *ngIf="assessmentResult.feedback?.length">
+      <p><strong>Feedback:</strong></p>
+      <ul>
+        <li *ngFor="let f of assessmentResult.feedback">{{ f }}</li>
+      </ul>
+    </div>
+  </div>
+</div>

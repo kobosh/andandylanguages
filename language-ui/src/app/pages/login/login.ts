@@ -38,10 +38,7 @@ export class Login implements OnInit{
   ngOnInit() {
     this.idleService.stopWatching();
 
-      this.route.queryParams.subscribe(params => {
-        this.role = params['role'] || '';
-        console.log('ROLE FROM URL:', this.role);
-      });
+
     }
 
   login() {
@@ -53,21 +50,24 @@ export class Login implements OnInit{
       role:this.role
     }).subscribe({
       next: (resp: any) => {
-        console.log("IN LOG IN ??????",resp);
+        console.log("IN LOG IN  resp",resp.toString());
        localStorage.setItem('token', resp.accessToken);
+        localStorage.setItem('role', resp.role);
         console.log('🔥 TOKEN AFTER LOGIN:', localStorage.getItem('token'));
-        //localStorage.setItem('token', resp.accessToken);
+
 
         this.idleService.startWatching();
         setTimeout(() => {
-          if (this.role === 'contrib') {
-            console.log(this.role+"  demo record");
-            this.router.navigate(['/demo-record']);
-          } else if (this.role === 'learner') {
-            this.router.navigate(['/listen']);
-          } else if (this.role === 'admin') {
-            this.router.navigate(['/login']); // or admin page later
-          } else {
+          if (resp.role === 'contrib') {
+            console.log(resp.role+"  go to record page");
+            this.router.navigate(['/record']);
+           }
+          else if (resp.role === 'learner') {
+            console.log(resp.role+"  go to practice word");
+            this.router.navigate(['/learner']);
+          }
+
+            else {
             this.router.navigate(['/login']);
           }
 

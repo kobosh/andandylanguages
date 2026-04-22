@@ -12,7 +12,9 @@ import java.io.IOException;
 public class AudioConversionService {
 
     public File normalizeToMono16kWav(File inputFile) throws Exception {
-        try (AudioInputStream originalAis = AudioSystem.getAudioInputStream(inputFile)) {
+        System.out.println("Before TRY INPUT FILE: name " + inputFile.getName());
+       // try (
+                AudioInputStream originalAis = AudioSystem.getAudioInputStream(inputFile);//) {
             AudioFormat sourceFormat = originalAis.getFormat();
            // AudioFormat sourceFormat = sourceAis.getFormat();
             System.out.println("INPUT FILE: name " + inputFile.getName());
@@ -42,10 +44,10 @@ public class AudioConversionService {
             convertedAis.close();
 
             return normalizedFile;
-        } catch (UnsupportedAudioFileException e) {
-            throw new IllegalArgumentException("Unsupported audio format. Please upload a WAV file for now.", e);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to normalize audio.", e);
-        }
+//        } catch (UnsupportedAudioFileException e) {
+//            throw new IllegalArgumentException("Unsupported audio format. Please upload a WAV file for now.", e);
+//        } catch (IOException e) {
+//            throw new RuntimeException("Failed to normalize audio.", e);
+//        }
     }
 }

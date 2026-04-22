@@ -16,7 +16,8 @@ import java.util.List;
 //
 //import java.util.List;
 import java.util.Optional;
-public interface RecordingRepository extends JpaRepository<Recording, Long> {
+public interface
+RecordingRepository extends JpaRepository<Recording, Long> {
 
     List<Recording> findByWordObjectKeyIsNotNull();
     Optional<Recording> findByIdAndUserId(Long id, Long userId);
