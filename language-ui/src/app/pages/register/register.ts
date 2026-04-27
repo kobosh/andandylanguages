@@ -31,7 +31,8 @@ export class Register implements OnInit{
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.role = params['role'] || '';
-      console.log('ROLE FROM URL:', this.role);
+
+
     });
   }
   register(form: NgForm) {

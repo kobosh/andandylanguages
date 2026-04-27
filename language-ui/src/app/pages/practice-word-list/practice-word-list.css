@@ -198,3 +198,17 @@
     flex-direction: column;
   }
 }
+select {
+  appearance: none; /* Hide default arrow */
+  background-color: white;
+  border: 2px solid #3498db;
+  padding: 10px 40px 10px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+
+  /* Add custom arrow via background image */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://w3.org" width="292.4" height="292.4"><path fill="%233498db" d="M287 69.4a17.6 17.6 0 0 0-13-5.4H18.4c-5 0-9.3 1.8-12.9 5.4A17.6 17.6 0 0 0 0 82.2c0 5 1.8 9.3 5.4 12.9l128 127.9c3.6 3.6 7.8 5.4 12.8 5.4s9.2-1.8 12.8-5.4L287 95c3.5-3.5 5.4-7.8 5.4-12.8 0-5-1.9-9.2-5.4-12.8z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}

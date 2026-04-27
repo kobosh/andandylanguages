@@ -72,7 +72,7 @@ export class Record implements OnInit, AfterViewInit {
       this.isLearner = this.role === 'learner';
       this.isContributor = true;// this.role === 'contrib' || this.role === 'contributor';
 
-      console.log("ROLE ", this.role,'token', token);
+
       console.log('payload', payload);
     }
   }
@@ -107,7 +107,7 @@ export class Record implements OnInit, AfterViewInit {
   }
 
   async start() {
-    console.log('START clicked');
+
 
     this.recordedChunks = [];
     this.recordedBlob = null;
@@ -177,7 +177,7 @@ export class Record implements OnInit, AfterViewInit {
 
   async uploadTrimmedCompressed() {
     this.isUploading=false;
-    console.log("is uploading false? ",this.isUploading);
+
     if (!this.trimmedBlob) {
       alert('Trim first');
       return;
@@ -199,8 +199,7 @@ export class Record implements OnInit, AfterViewInit {
     const filename = `${this.isWordMode ? 'word' : 'sentence'}-${safeBase}-${Date.now()}.webm`;
 
     this.isUploading = true;
-    console.log("is uploading true? ",this.isUploading);
-    console.log("UPLOAD trimmed  full name:",this.fullName);
+
     const req$ = this.isWordMode
 
         ? this.uploadSrvc.uploadWord(
@@ -226,15 +225,12 @@ export class Record implements OnInit, AfterViewInit {
     req$.subscribe({
       next: (resp: any) => {
 
-        console.log('Upload success', resp);
-        //alert('upload success');
+
 
         if (this.isWordMode) {
           const id = Number(resp?.id);
           if (!id) {
-            console.error('Upload word response missing id', resp);
-           // alert('Upload succeeded but no recording id returned.');
-            return;
+                       return;
           }
 
           this.currentRecordingId = id;
@@ -266,7 +262,7 @@ export class Record implements OnInit, AfterViewInit {
 
       },
       error: (err: any) => {
-        console.error('Upload failed', err);
+
         alert('Upload failed (check console / backend logs).');
         this.isUploading = false;
       },
@@ -359,7 +355,7 @@ export class Record implements OnInit, AfterViewInit {
   }
 
   reset() {
-    console.log('RESET clicked');
+
 
     if (this.recorder && this.recorder.state === 'recording') {
       this.recorder.stop();
@@ -385,7 +381,7 @@ export class Record implements OnInit, AfterViewInit {
     this.waveSurfer?.empty();
     this.regionsPlugin?.clearRegions();
 
-    console.log('RESET complete');
+
   }
 
   playOriginal() {
@@ -427,9 +423,9 @@ export class Record implements OnInit, AfterViewInit {
   }
 
   submitAudio(): void {
-    console.log("calling submit audio  contributer? ",this.isContributor);
+
     if (this.isContributor) {
-      console.log("calling submit audio");
+
       this.uploadTrimmedCompressed();
       return;
     }

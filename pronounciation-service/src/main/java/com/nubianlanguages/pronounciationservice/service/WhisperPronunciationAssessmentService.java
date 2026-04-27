@@ -26,7 +26,7 @@ public class WhisperPronunciationAssessmentService {
 
                                         String languageCode,
                                         Long recordingId) throws Exception {
-        System.out.println("CALLIN ASSSESS  "+audio.toString());
+
 
         File uploaded = File.createTempFile("learner-", ".webm");
         File wavFile = null;
@@ -35,8 +35,7 @@ public class WhisperPronunciationAssessmentService {
             audio.transferTo(uploaded);
 
             wavFile = ffmpegAudioConversionService.convertToWav(uploaded);
-          System.out.println("WHERE IS WAV "+wavFile.getAbsolutePath());
-            String recognizedText = whisperSpeechService.transcribe(wavFile);
+                      String recognizedText = whisperSpeechService.transcribe(wavFile);
 
             double accuracy = scoreSimilarity(expectedText, recognizedText);
             double completeness = recognizedText.isBlank() ? 0 : 100;

@@ -23,13 +23,14 @@ public class PronunciationController {
     private final WhisperPronunciationAssessmentService whisperPronunciationAssessmentService;
 private final FfmpegAudioConversionService ffmpegaudioConversionService;
 private  final WhisperSpeechService whisperSpeechService;
-private final VoskSpeechService voskspeechService;
-    public PronunciationController(WhisperPronunciationAssessmentService pronunciationService, AudioConversionService audioConversionService, FfmpegAudioConversionService ffmpegaudioConversionService, WhisperSpeechService whisperSpeechService, VoskSpeechService voskspeechService) {
+
+    public PronunciationController(WhisperPronunciationAssessmentService pronunciationService, AudioConversionService audioConversionService, FfmpegAudioConversionService ffmpegaudioConversionService,
+                                   WhisperSpeechService whisperSpeechService) {
         this.whisperPronunciationAssessmentService = pronunciationService;
         this.ffmpegaudioConversionService = ffmpegaudioConversionService;
         this.whisperSpeechService = whisperSpeechService;
 
-        this.voskspeechService = voskspeechService;
+
 
     }
     @PostMapping(value = "/transcribe", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -48,10 +49,10 @@ private final VoskSpeechService voskspeechService;
         try {
             audio.transferTo(tempFile);
           tempFile=  ffmpegaudioConversionService.convertToWav(tempFile);
-            System.out.println("CONVERTED FILE "+tempFile.getAbsolutePath());
+
             // call whisper
             String transcript = whisperSpeechService.transcribe(tempFile);
-            System.out.println("PRONNCIATION CONTROLLER  transcript "+transcript);
+
             return ResponseEntity.ok(Map.of(
                     "recordingId", recordingId != null ? recordingId.toString() : "",
                     "transcript", transcript
@@ -77,18 +78,7 @@ private final VoskSpeechService voskspeechService;
 
         return ResponseEntity.ok(result);
     }
-   /* @PostMapping(value = "/assess", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<PronunciationResponse> assess(
-            @RequestPart("audio") MultipartFile audio,
-            @RequestParam("expectedText") @NotBlank String expectedText,
-            @RequestParam(value = "languageCode", required = false) String languageCode,
-            @RequestParam(value = "recordingId", required = false) Long recordingId
-    ) {
-        PronunciationResponse response = pronunciationService.assess(
-                audio, expectedText, languageCode, recordingId
-        );
-        return ResponseEntity.ok(response);
-    }*/
+
     @PostMapping(value = "/convert-webm", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ByteArrayResource> convertWebmToWav(
             @RequestPart("audio") MultipartFile audio
@@ -134,55 +124,7 @@ private final VoskSpeechService voskspeechService;
         }
     }
 
-    @PostMapping(value = "/simple-stt", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> simpleSpeechToText(
-            @RequestPart("audio") MultipartFile audio
-    ) throws Exception {
 
-        if (audio == null || audio.isEmpty()) {
-            throw new IllegalArgumentException("Audio file is required.");
-        }
-
-        String originalFilename = audio.getOriginalFilename();
-        if (originalFilename == null || !originalFilename.toLowerCase().endsWith(".webm")) {
-            throw new IllegalArgumentException("Only .webm files are supported.");
-        }
-
-        File uploadedFile = File.createTempFile("upload-", ".webm");
-        File wavFile = null;
-
-        try {
-
-            audio.transferTo(uploadedFile);
-
-            wavFile = ffmpegaudioConversionService.convertToWav(uploadedFile);
-
-
-            String recognizedText = voskspeechService.recognizeOpen(wavFile);
-
-            // normalize
-            String expectedText="urr dool ";
-            String expected = normalize(expectedText);
-            String actual = normalize(recognizedText);
-            System.out.println("expected text "+expected+" actual "+actual);
-
-            // ⭐ USE IT HERE
-            int score = similarityScore(expected, actual);
-            return ResponseEntity.ok(Map.of(
-                    "expectedText", expectedText,
-                    "recognizedText", recognizedText,
-                    "score", score
-            ));
-
-           /*return ResponseEntity.ok(Map.of(
-                    "text", recognizedText == null ? "" : recognizedText
-            ));*/
-
-        } finally {
-            if (uploadedFile.exists()) uploadedFile.delete();
-            if (wavFile != null && wavFile.exists()) wavFile.delete();
-        }
-    }
     private String normalize(String text) {
         if (text == null) return "";
         return text.toLowerCase()

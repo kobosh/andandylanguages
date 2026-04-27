@@ -1,6 +1,7 @@
 package com.nubianlanguages.audioservices.controller;
 
 import com.nubianlanguages.audioservices.dto.*;
+import com.nubianlanguages.audioservices.entity.Dialect;
 import com.nubianlanguages.audioservices.entity.Recording;
 import com.nubianlanguages.audioservices.repository.RecordingRepository;
 import com.nubianlanguages.audioservices.service.MinioStorageService;
@@ -30,7 +31,7 @@ import  com.nubianlanguages.audioservices.dto.PracticeWordResponse;
 @Slf4j
 public class RecordingController {
 
-
+    Dialect dialect;
     private final MinioStorageService minioStorageService;
     private final RecordingService recordingService;
     private final RecordingRepository recordingRepository;
@@ -61,9 +62,16 @@ public class RecordingController {
     // 🎧 STREAM WORD or SENTENCE
     // GET /api/recordings/{id}/stream?type=WORD
     @GetMapping("/practice-words")
-    public List<PracticeWordResponse> getPracticeWords() {
+    public List<PracticeWordResponse> getPracticeWords(   @RequestParam(required = false) String dialect) {
+      List<Recording> recordings=null;
+        if (dialect != null) {
+            Dialect d = Dialect.valueOf(dialect.toUpperCase());
+          recordings= recordingService.findByDialect(d);
 
-        List<Recording> recordings = recordingRepository.findAll();
+        }
+   else {
+            recordings =recordingService.findAll();
+        }
 
         return recordings.stream()
 

@@ -99,6 +99,14 @@ public class RecordingService {
     }
 
 
+    public List<Recording> findByDialect(Dialect d) {
+
+        return recordingRepository.findByDialect(d);
+    }
+
+    public List<Recording> findAll() {
+      return   recordingRepository.findAll();
+    }
 }
 
 

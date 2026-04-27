@@ -4,7 +4,7 @@ export const routes: Routes = [
   {
     path: 'listen',
     loadComponent: () =>
-      import('./pages/guest-word-list/guest-word-list-component')
+      import('./pages/guest-word-listX/guest-word-list-component')
         .then(m => m.GuestWordListComponent)
   },
   {

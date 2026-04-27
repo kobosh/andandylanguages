@@ -114,9 +114,9 @@ export class DemoRecordComponent implements AfterViewInit,OnInit {
     Object.values(this.regions.getRegions()).forEach(r => r.remove());
   }
   playTrimmed() {
-    console.log('in playtrimmed')
+
     if (!this.trimmedBlob) return;
-    console.log('in playtrimmed size=',this.trimmedBlob.size)
+
     this.waveSurfer.loadBlob(this.trimmedBlob);
     this.waveSurfer.once('ready', () => {
       this.waveSurfer.play();

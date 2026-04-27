@@ -1,4 +1,13 @@
 <!-- practice-word-list.html -->
+<div class="form-field">
+  <label>Dialect</label>
+
+  <select [(ngModel)]="dialect" name="dialect" (change)="onDialectChange()" >
+    <option [ngValue]="null ">-- Select Dialect --</option>
+    <option *ngFor="let d of dialects" [value]="d">{{ d }}</option>
+  </select>
+
+</div>
 
 <div *ngIf="viewMode === 'practice'">
 

@@ -261,50 +261,7 @@ export class AssessmentComponent implements AfterViewInit {
 
   }
 
- /*assess(): void {
-    if (!this.item) {
-      this.assessmentError = 'No practice item selected.';
-      return;
-    }
 
-    const audioToSend = this.trimmedBlob ?? this.recordedBlob;
-    if (!audioToSend) {
-      this.assessmentError = 'Please record audio first.';
-      return;
-    }
-
-    const expectedText = this.isWordMode ? this.item.word : this.item.sentence;
-    if (!expectedText) {
-      this.assessmentError = 'Expected text is missing.';
-      return;
-    }
-
-    this.assessmentLoading = true;
-    this.assessmentError = '';
-    this.assessmentResult = null;
-
-    const formData = new FormData();
-    formData.append('audio', audioToSend, 'learner-recording.webm');
-    formData.append('expectedText', expectedText);
-    formData.append('languageCode', 'en-US');
-    formData.append('recordingId', String(this.item.id));
-
-    const token = localStorage.getItem('token');
-
-    this.httpPostAssess(formData, token).subscribe({
-      next: (result) => {
-        console.log('Assessment result:', result);
-        this.assessmentResult = result;
-        this.recognizedText = result.recognizedText ?? '';
-        this.assessmentLoading = false;
-      },
-      error: (err) => {
-        console.error('Assessment failed', err);
-        this.assessmentError = err?.error?.message || 'Assessment failed.';
-        this.assessmentLoading = false;
-      }
-    });
-  }*/
 
   private httpPostAssess(formData: FormData, token: string | null) {
     return this.http.post<AssessmentResponse>(
@@ -398,7 +355,7 @@ export class AssessmentComponent implements AfterViewInit {
     ).subscribe({
       next: (res) => {
         const transcript = res.transcript?.trim() ?? '';
-         console.log("TRANSCRIBEREFERENCEAUDIO transcript",transcript);
+
         if (!transcript) {
           this.assessmentError = 'Reference transcription failed.';
           this.isPreparingTranscript = false;
@@ -438,9 +395,7 @@ export class AssessmentComponent implements AfterViewInit {
       this.assessmentLoading = false;
       return;
     }
-    console.log('item in assessment =', this.item);
-    console.log('isWordMode =', this.isWordMode);
-    console.log('audioUrl =', this.isWordMode ? this.item?.wordAudioUrl : this.item?.sentenceAudioUrl);
+
     const formData = new FormData();
     formData.append('audio', audioToSend, 'learner-recording.webm');
     formData.append('expectedText', expectedText);
@@ -461,7 +416,7 @@ export class AssessmentComponent implements AfterViewInit {
         : {}
     ).subscribe({
       next: (result) => {
-        console.log('Assessment result:', result);
+
         this.assessmentResult = result;
         this.recognizedText = result.recognizedText ?? '';
         this.assessmentLoading = false;
@@ -498,6 +453,6 @@ export class AssessmentComponent implements AfterViewInit {
       this.audioUrl = null;
     }
 
-    console.log('Waveform cleared after assessment');
+
   }
 }

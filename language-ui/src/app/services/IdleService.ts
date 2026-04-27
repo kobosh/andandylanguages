@@ -49,7 +49,7 @@ export class IdleService {
 
   private getRemainingMsFromToken(): number {
     const token = localStorage.getItem('token');
-    //console.log('IdleService TOKEN:', token);
+
 
     if (!token) return 0;
 

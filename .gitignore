@@ -1,0 +1,7 @@
+data/*.mv.db
+data/*.trace.db
+language-ui/*.exe
+language-ui/node_modules/
+language-ui/dist/
+*.mv.db
+*.mv

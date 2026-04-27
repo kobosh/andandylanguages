@@ -25,7 +25,7 @@ public class AudioUploadService {
     @PostConstruct
     public void createBucketsIfNotExists() {
 
-        System.out.println("AudioUploadService: Checking MinIO buckets");
+
 
         createIfMissing(wordBucket);
         createIfMissing(sentenceBucket);

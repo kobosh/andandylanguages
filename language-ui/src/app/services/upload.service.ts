@@ -20,8 +20,7 @@ export class UploadService {
   uploadWord(
     word: string, meaning: string, blob: Blob, filename: string, author: string, dialect: string | null):
     Observable<UploadWordResponse> {
-    console.log("UPLOADSERVICE dialct", dialect, "AUTHOR ", localStorage.getItem('author'));
-    //author= 'ko kob';//localStorage.getItem('author')
+
     const formData = new FormData();
     formData.append('word', word);
     formData.append('meaning', meaning);

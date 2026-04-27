@@ -92,32 +92,5 @@ public class AudioService {
 
         return new UploadResponse(objectName, fileUrl);
     }
-    //pronunciatio
-  /*  public List<PracticeItemSummaryResponse> getPublishedItems() {
-        return recordingRepository.findByPublishedTrue()
-                .stream()
-                .map(rec -> new PracticeItemSummaryResponse(
-                        rec.getId(),
-                        rec.getWord(),
-                        rec.getMeaning()
-                ))
-                .toList();
-    }
 
-    public PracticeItemResponse getPublishedItem(Long id) {
-        Recording rec = recordingRepository.findByIdAndPublishedTrue(id)
-                .orElseThrow(() -> new RuntimeException("Practice item not found"));
-
-        return new PracticeItemResponse(
-                rec.getId(),
-                rec.getWord(),
-                rec.getMeaning(),
-                rec.getSentence(),
-                rec.getSentenceMeaning(),
-                wordbucket,
-                sentencebucket,
-                rec.getWordObjectKey(),
-                rec.getSentenceObjectKey()
-        );
-    }*/
 }

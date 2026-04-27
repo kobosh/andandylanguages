@@ -28,10 +28,7 @@
     <button (click)="playSentence()">▶ Play Sentence</button>
   </div>
 
-  <!-- LOADING -->
-<!--  <div *ngIf="isLoadingAudio" class="loading">-->
-<!--    {{ loadingMessage }}-->
-<!--  </div>-->
+
   <app-loading-spinner
     *ngIf="isLoadingAudio"
     [message]="'Loading audio... please wait'"

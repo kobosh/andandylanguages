@@ -34,29 +34,7 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-   /* @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
-
-
-        AppUser user = userRepository.findByEmail(request.getEmail())
-                .filter(u -> u.getPassword().equals(request.getPassword())) // example
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
-
-        // 🔑 Authentication already succeeded
-        String token = jwtService.generateToken(
-                user.getId().toString(),
-                expirationMs,
-                user.getFullname()
-        );
-
-        return ResponseEntity.ok(
-                Map.of(
-                        "accessToken", token,
-                        "expiresIn", expirationMs / 1000
-                )
-        );
-    }*/
    @PostMapping("/login")
    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
@@ -82,11 +60,7 @@ public class AuthController {
                expirationMs,
                user.getFullname()
        );
-//       if (request.getRole() != null) {
-//           user.setRole(request.getRole());
-//       }
-       System.out.println("AuthController login  info: "+" role "+ user.getRole()+" email "+
-               user.getEmail()+" PWD "+user.getPassword());
+
        return ResponseEntity.ok(
                Map.of(
                        "accessToken", token,
@@ -96,53 +70,7 @@ public class AuthController {
        );
    }
 
-   /* @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
-        // 1️⃣ Validate input (minimal, but necessary)
-        if (request.getEmail() == null || request.getPassword() == null) {
-            return ResponseEntity.badRequest().body("Email and password are required");
-        }
-
-        // 2️⃣ Prevent duplicate users
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.status(409).body("Email already exists");
-        }
-
-        // 3️⃣ Create user
-        AppUser user = new AppUser();
-        user.setEmail(request.getEmail());
-        // ⚠️ Plain text for now (OK for dev, NOT prod)
-        user.setPassword(request.getPassword());
-        //user.setPassword(passwordEncoder.encode(request.getPassword()));
-        // OPTIONAL: only set name if it exists
-        if (request.getName() != null) {
-            user.setFullname(request.getName());
-        }
-
-        userRepository.save(user);
-
-        System.out.println("✅ Saved to H2 MEM: " + user.getEmail());
-// 4️⃣ Issue JWT immediately after register
-        String token = jwtService.generateToken(
-                user.getId().toString(),
-                expirationMs, user.getFullname()
-
-        );
-
-// 5️⃣ Return token + expiration
-        return ResponseEntity.status(201).body(
-                Map.of(
-                        "accessToken", token,
-                        "expiresIn", expirationMs / 1000,          // seconds
-                        "expiresAt",
-                        user.getFullname()// epoch ms
-
-                )
-        );
-
-
-    }*/
    @PostMapping("/register")
    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
@@ -177,7 +105,7 @@ public class AuthController {
                user.getFullname()
        );
        String role= user.getRole();
-System.out.println("ROLE in register "+role);
+
 
        return ResponseEntity.status(201).body(
                Map.of(

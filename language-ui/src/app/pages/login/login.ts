@@ -42,7 +42,7 @@ export class Login implements OnInit{
     }
 
   login() {
-    console.log("in log in");
+
     this.http.post('http://localhost:8082/api/auth/login',
       {
       email: this.email,
@@ -50,20 +50,19 @@ export class Login implements OnInit{
       role:this.role
     }).subscribe({
       next: (resp: any) => {
-        console.log("IN LOG IN  resp",resp.toString());
-       localStorage.setItem('token', resp.accessToken);
-        localStorage.setItem('role', resp.role);
-        console.log('🔥 TOKEN AFTER LOGIN:', localStorage.getItem('token'));
+        console.log('LOGIN RESPONSE:', resp.accessToken);
 
+        localStorage.setItem('token', resp.accessToken);
+        localStorage.setItem('role', resp.role);
 
         this.idleService.startWatching();
         setTimeout(() => {
           if (resp.role === 'contrib') {
-            console.log(resp.role+"  go to record page");
+
             this.router.navigate(['/record']);
            }
           else if (resp.role === 'learner') {
-            console.log(resp.role+"  go to practice word");
+
             this.router.navigate(['/learner']);
           }
 

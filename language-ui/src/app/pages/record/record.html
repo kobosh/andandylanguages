@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      <div class="form-field" *ngIf="isContributor">
+      <div class="form-field" >
         <label>{{ isWordMode ? 'Word Meaning' : 'Sentence Meaning' }}</label>
 
         <input
@@ -90,7 +90,11 @@
 
     </div>
     <section class="card recorder" >
-    <div #waveformContainer class="waveform"></div>
+      <div
+        #waveformContainer
+        id="waveform"
+        class="waveform-box">
+      </div>
 
     <div class="now-playing" *ngIf="nowPlaying">
       ▶ Now playing: <strong>{{ nowPlaying }}</strong>

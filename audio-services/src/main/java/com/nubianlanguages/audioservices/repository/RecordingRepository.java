@@ -1,5 +1,6 @@
 package com.nubianlanguages.audioservices.repository;
 
+import com.nubianlanguages.audioservices.entity.Dialect;
 import com.nubianlanguages.audioservices.entity.Recording;
 import com.nubianlanguages.audioservices.entity.RecordingType;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,7 @@ RecordingRepository extends JpaRepository<Recording, Long> {
 
     boolean existsByIdAndUserId(Long id, Long userId);
     @NotNull List<Recording> findAll();
+    List<Recording> findByDialect(Dialect dialect);
 
 }
 

@@ -42,65 +42,8 @@ export class PracticeWordSentence {
     if (!this.item) return;
     this.playAudio('sentence', this.item.sentenceAudioUrl);
   }
- /* private playAudio(label: string, audioUrl: string): void {
-    const token = localStorage.getItem('token');
 
-    if (!token || !audioUrl) {
-      this.error = 'Missing token or audio URL';
-      return;
-    }
 
-    this.isLoadingAudio = true;
-    this.error = '';
-    this.nowPlaying = label;
-    this.stopCurrentAudio();
-
-    this.http.get(`http://localhost:8083${audioUrl}`, {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${token}`
-      }),
-      responseType: 'blob'
-    }).subscribe({
-      next: (blob) => {
-        this.isLoadingAudio = false;
-
-        if (this.item) {
-          this.transcribeReferenceAudio(blob, label, this.item.id);
-        }
-
-        const objectUrl = URL.createObjectURL(blob);
-        const audio = new Audio(objectUrl);
-        this.currentAudio = audio;
-
-        audio.onended = () => {
-          this.nowPlaying = null;
-          URL.revokeObjectURL(objectUrl);
-          this.currentAudio = null;
-        };
-
-        audio.onerror = () => {
-          this.error = 'Failed to play audio';
-          this.nowPlaying = null;
-          URL.revokeObjectURL(objectUrl);
-          this.currentAudio = null;
-        };
-
-        audio.play().catch(err => {
-          console.error(err);
-          this.error = 'Could not play audio';
-          this.nowPlaying = null;
-          URL.revokeObjectURL(objectUrl);
-          this.currentAudio = null;
-        });
-      },
-      error: (err) => {
-        console.error(err);
-        this.isLoadingAudio = false;
-        this.error = 'Failed to load audio';
-        this.nowPlaying = null;
-      }
-    });
-  }*/
  private playAudio(label: string, audioUrl: string): void {
     const token = localStorage.getItem('token');
 
