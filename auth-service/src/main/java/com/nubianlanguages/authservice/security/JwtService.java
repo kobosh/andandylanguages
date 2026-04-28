@@ -21,7 +21,7 @@ public class JwtService {
     }
 
     public String generateToken(String userId, long expirationMs,String fullname) {
-        System.out.println();
+
         try {
             JWTClaimsSet claims = new JWTClaimsSet.Builder()
                     .subject(userId)

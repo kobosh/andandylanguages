@@ -1,7 +1,31 @@
-data/*.mv.db
-data/*.trace.db
-language-ui/*.exe
+# ===== DATABASE =====
+data/
+*.mv.db
+*.trace.db
+
+# ===== MAVEN =====
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# ===== IDE =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.settings/
+.project
+.classpath
+
+# ===== NODE / ANGULAR =====
 language-ui/node_modules/
 language-ui/dist/
-*.mv.db
-*.mv
+
+# ===== BINARIES =====
+*.exe
+
+# ===== JWT KEYS =====
+private.key
+public.key
+
+# ===== VS CODE =====
+.vscode/

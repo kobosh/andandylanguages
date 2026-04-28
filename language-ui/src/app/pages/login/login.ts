@@ -50,7 +50,7 @@ export class Login implements OnInit{
       role:this.role
     }).subscribe({
       next: (resp: any) => {
-        console.log('LOGIN RESPONSE:', resp.accessToken);
+        console.log("ROLE ",resp.role,'LOGIN RESPONSE:', resp.accessToken);
 
         localStorage.setItem('token', resp.accessToken);
         localStorage.setItem('role', resp.role);

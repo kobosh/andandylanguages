@@ -63,12 +63,20 @@ export class PracticeWordListComponent implements OnInit {
   }
   loadPracticeWords(): void {
     console.log("calling loadpracticewords"+this.dialect);
+
+    const token = localStorage.getItem('token');
+    console.log('TOKEN SENT TO AUDIO SERVICE:', token);
     this.error = '';
     if (!this.dialect) {
       this.error = 'Please select a dialect first';
       return;
     }
-    this.http.get<PracticeWord[]>(`http://localhost:8083/api/recordings/practice-words?dialect=${this.dialect}`)
+    this.http.get<PracticeWord[]>(`http://localhost:8083/api/recordings/practice-words?dialect=${this.dialect}`,
+      {
+        headers:{
+          authorization: `Bearer ${token}`
+        }
+      })
       .subscribe({
         next: (items) => {
           this.practiceWords = items;
