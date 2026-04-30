@@ -1,4 +1,13 @@
 <!-- practice-word-list.html -->
+<div>
+  <p>
+    Select dialect you want to learn: Dongoawi,Mahassi or Kenzi
+  </p>
+</div>
+<div *ngIf="isUploading" class="spinner-container">
+  <div class="spinner"></div>
+  <p>uploading words... please wait</p>
+</div>
 <div class="form-field">
   <label>Dialect</label>
 

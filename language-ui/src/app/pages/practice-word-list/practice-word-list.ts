@@ -44,18 +44,18 @@ export class PracticeWordListComponent implements OnInit {
   constructor(private http: HttpClient) {
     console.log('🔥 constructor fired');
   }
-
+  isUploading=false;
   ngOnInit(): void {
-    console.log('🔥 ngOnInit fired');
+
     const token = localStorage.getItem('token');
     if (token) {
       const payload = JSON.parse(atob(token.split('.')[1]));
       this.fullName = payload.fullName ?? '';
     }
-  // this.loadPracticeWords();
+
   }
   onDialectChange(): void {
-    console.log('selected dialect:', this.dialect);
+
 
     if (this.dialect) {
       this.loadPracticeWords();
@@ -71,18 +71,21 @@ export class PracticeWordListComponent implements OnInit {
       this.error = 'Please select a dialect first';
       return;
     }
+    this.isUploading=true;
     this.http.get<PracticeWord[]>(`http://localhost:8083/api/recordings/practice-words?dialect=${this.dialect}`,
       {
         headers:{
-          authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       })
       .subscribe({
+
         next: (items) => {
           this.practiceWords = items;
           if (items.length > 0) {
             this.currentIndex = 0;
             this.selectedWord = items[0];
+            this.isUploading=false;
           }
           else { alert(" Not available ");}
 
@@ -91,11 +94,13 @@ export class PracticeWordListComponent implements OnInit {
         error: (err) => {
           console.error(err);
           this.error = 'Failed to load practice words';
-        }
+        },
+        complete: ()=>{this.isUploading=false;}
       });
   }
 
   get currentItem(): PracticeWord | null {
+    if(this.isUploading) return  null;
     if (!this.practiceWords.length) return null;
     return this.practiceWords[this.currentIndex];
   }

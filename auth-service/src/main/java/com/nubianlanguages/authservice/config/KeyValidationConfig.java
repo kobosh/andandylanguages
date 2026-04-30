@@ -5,10 +5,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.Signature;
-
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 
 @Configuration
 public class KeyValidationConfig {
@@ -16,28 +15,32 @@ public class KeyValidationConfig {
     @Bean
     ApplicationRunner validateKeysOnStartup(JwtKeyLoader loader) {
         return args -> {
-            PrivateKey privateKey = loader.loadPrivateKey();
-            PublicKey publicKey = loader.loadPublicKey();
+            try {
+                RSAPrivateKey privateKey = loader.getRsaKey().toRSAPrivateKey();
+                RSAPublicKey publicKey = loader.getRsaKey().toRSAPublicKey();
 
-            byte[] testData = "jwt-key-validation".getBytes();
+                byte[] testData = "jwt-key-validation".getBytes();
 
-            Signature signer = Signature.getInstance("SHA256withRSA");
-            signer.initSign(privateKey);
-            signer.update(testData);
-            byte[] signature = signer.sign();
+                Signature signer = Signature.getInstance("SHA256withRSA");
+                signer.initSign(privateKey);
+                signer.update(testData);
+                byte[] signature = signer.sign();
 
-            Signature verifier = Signature.getInstance("SHA256withRSA");
-            verifier.initVerify(publicKey);
-            verifier.update(testData);
+                Signature verifier = Signature.getInstance("SHA256withRSA");
+                verifier.initVerify(publicKey);
+                verifier.update(testData);
 
-            if (!verifier.verify(signature)) {
-                throw new IllegalStateException(
-                        "Private/Public key mismatch — JWT signing will fail"
-                );
+                if (!verifier.verify(signature)) {
+                    throw new IllegalStateException(
+                            "Private/Public key mismatch — JWT signing will fail"
+                    );
+                }
+
+                System.out.println("✅ RSA key pair validated successfully");
+
+            } catch (Exception e) {
+                throw new RuntimeException("JWT key validation failed", e);
             }
-
-            System.out.println("✅ RSA key pair validated successfully");
         };
     }
 }
-
