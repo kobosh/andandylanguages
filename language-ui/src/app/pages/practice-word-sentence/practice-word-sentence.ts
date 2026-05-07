@@ -22,7 +22,8 @@ export class PracticeWordSentence {
   @Output() prev = new EventEmitter<void>();
   isPreparingTranscript=false;
 
-
+  learnerAudioBlob: Blob | null = null;
+  expectedText = '';
   error = '';
   nowPlaying: string | null = null;
   isLoadingAudio = false;
@@ -43,7 +44,7 @@ export class PracticeWordSentence {
     this.playAudio('sentence', this.item.sentenceAudioUrl);
   }
 
-
+  private currentObjectUrl: string | null = null;
  private playAudio(label: string, audioUrl: string): void {
     const token = localStorage.getItem('token');
 
@@ -58,6 +59,7 @@ export class PracticeWordSentence {
     this.nowPlaying = label;
     this.stopCurrentAudio();
 
+
     this.http.get(`http://localhost:8083${audioUrl}`, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${token}`
@@ -69,6 +71,7 @@ export class PracticeWordSentence {
 
         const objectUrl = URL.createObjectURL(blob);
         const audio = new Audio(objectUrl);
+        this.currentObjectUrl=objectUrl;
         this.currentAudio = audio;
 
         audio.onended = () => {
@@ -100,6 +103,7 @@ export class PracticeWordSentence {
       }
     });
   }
+
 
   private stopCurrentAudio(): void {
     if (this.currentAudio) {

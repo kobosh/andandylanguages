@@ -185,3 +185,9 @@ select {
   background-position: right 10px center;
   background-size: 12px;
 }
+.waveform,
+.wave-wrapper,
+#waveform {
+  touch-action: none;
+  user-select: none;
+}

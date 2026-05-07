@@ -44,18 +44,59 @@ export class AssessmentComponent implements AfterViewInit {
   assessmentLoading = false;
   assessmentError = '';
   assessmentResult: AssessmentResponse | null = null;
-  recognizedText = '';
+
   isPreparingTranscript = false;
   expectedWordText = '';
   expectedSentenceText = '';
-  //isPreparingTranscript = false;
+
 
   wordTranscriptCache: Record<number, string> = {};
   sentenceTranscriptCache: Record<number, string> = {};
+  constructor( private  http: HttpClient) {}
+
   ngAfterViewInit(): void {
     this.initWaveSurfer();
   }
+  reset(): void {
+    // stop recording if still active
+    if (this.recorder && this.recorder.state === 'recording') {
+      this.recorder.stop();
+    }
 
+    // release microphone
+    if (this.recorder?.stream) {
+      this.recorder.stream.getTracks().forEach(track => track.stop());
+    }
+
+    this.recorder = null;
+    this.recordedChunks = [];
+
+    // clear learner audio
+    this.recordedBlob = null;
+    this.trimmedBlob = null;
+
+    // reset UI state
+    this.hasRegion = false;
+    this.nowPlaying = null;
+    //this.error = '';
+    this.assessmentResult = null;
+    this.assessmentLoading = false;
+
+    // clear local audio URL
+    if (this.audioUrl) {
+      URL.revokeObjectURL(this.audioUrl);
+      this.audioUrl = null;
+    }
+
+    // stop and clear waveform
+    if (this.waveSurfer) {
+      this.waveSurfer.stop();
+      this.waveSurfer.empty();
+    }
+
+    // clear selected regions
+    this.regionsPlugin?.clearRegions();
+  }
   initWaveSurfer(): void {
     if (!this.waveformContainer?.nativeElement) return;
 
@@ -160,7 +201,7 @@ export class AssessmentComponent implements AfterViewInit {
     });
   }
 
-  async trimOnly() {
+ /* async trimOnly() {
     if (!this.recordedBlob) {
       alert('Nothing to trim');
       return;
@@ -202,9 +243,9 @@ export class AssessmentComponent implements AfterViewInit {
 
     this.hasRegion = false;
     this.nowPlaying = 'Trimmed';
-  }
+  }*/
 
-  encodeWav(buffer: AudioBuffer): Blob {
+ /* encodeWav(buffer: AudioBuffer): Blob {
     const samples = buffer.getChannelData(0);
     const ab = new ArrayBuffer(44 + samples.length * 2);
     const view = new DataView(ab);
@@ -240,7 +281,7 @@ export class AssessmentComponent implements AfterViewInit {
     });
 
     return new Blob([view], { type: 'audio/wav' });
-  }
+  }*/
   assess(): void {
     if (!this.item) {
       this.assessmentError = 'No practice item selected.';
@@ -256,30 +297,18 @@ export class AssessmentComponent implements AfterViewInit {
     this.assessmentLoading = true;
     this.assessmentError = '';
     this.assessmentResult = null;
-
-    this.fetchReferenceAudioBlob();
+    const audioToAssess = this.trimmedBlob ?? this.recordedBlob;
+    this.fetchReferenceAudioBlobAndTranscribe();
 
   }
 
 
 
-  private httpPostAssess(formData: FormData, token: string | null) {
-    return this.http.post<AssessmentResponse>(
-      'http://localhost:8084/api/pronunciation/assess',
-      formData,
-      token
-        ? {
-          headers: new HttpHeaders({
-            Authorization: `Bearer ${token}`
-          })
-        }
-        : {}
-    );
-  }
 
-  constructor(private http: HttpClient) {}
 
-  private fetchReferenceAudioBlob(): void {
+
+
+  private fetchReferenceAudioBlobAndTranscribe(): void {
     if (!this.item) {
       this.assessmentError = 'No practice item selected.';
       return;
@@ -302,6 +331,8 @@ export class AssessmentComponent implements AfterViewInit {
       responseType: 'blob'
     }).subscribe({
       next: (blob) => {
+
+
         this.transcribeReferenceAudio(blob, this.item!.id);
       },
       error: (err) => {
@@ -399,7 +430,7 @@ export class AssessmentComponent implements AfterViewInit {
     const formData = new FormData();
     formData.append('audio', audioToSend, 'learner-recording.webm');
     formData.append('expectedText', expectedText);
-    formData.append('languageCode', 'en-US');
+    formData.append('languageCode', 'sw');
     formData.append('recordingId', String(this.item.id));
 
     const token = localStorage.getItem('token');
@@ -416,9 +447,10 @@ export class AssessmentComponent implements AfterViewInit {
         : {}
     ).subscribe({
       next: (result) => {
+        console.log("expectedtext ",result);
 
         this.assessmentResult = result;
-        this.recognizedText = result.recognizedText ?? '';
+       // this.recognizedText = result.recognizedText ?? '';
         this.assessmentLoading = false;
         this.clearWaveform();
       },

@@ -1,9 +1,16 @@
 .waveform {
   width: 100%;
-  min-height: 100px;
-  border: 1px solid #ccc;
-  margin: 12px 0;
-  padding: 8px;
+  min-width: 0;
+  overflow-x: hidden;
+  touch-action: none;
+}
+
+.wave-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  touch-action:none;
+  user-select: none;
 }
 
 .actions {

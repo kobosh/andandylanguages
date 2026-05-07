@@ -68,6 +68,16 @@ services:
       - postgres
       - minio
       - auth-service
+  pronunciation-service:
+    build: ./pronounciation-service
+    container_name: pronunciation-service
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - audio-services
   language-ui:
     build: ./language-ui
     container_name: language-ui
@@ -77,6 +87,7 @@ services:
     depends_on:
       - auth-service
       - audio-services
+      - pronunciation-service
 volumes:
   pg_audio_data:
   auth_h2_data:

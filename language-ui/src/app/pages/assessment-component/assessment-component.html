@@ -19,16 +19,18 @@
     <button (click)="start()">Record</button>
     <button (click)="stop()">Stop</button>
     <button (click)="playOriginal()" [disabled]="!recordedBlob">Play Original</button>
-    <button (click)="trimOnly()" [disabled]="!recordedBlob">Trim</button>
-    <button (click)="playTrimmed()" [disabled]="!trimmedBlob">Play Trimmed</button>
+<!--    <button (click)="trimOnly()" [disabled]="!recordedBlob">Trim</button>-->
+<!--    <button (click)="playTrimmed()" [disabled]="!trimmedBlob">Play Trimmed</button>-->
+    <button class="btn secondary" (click)="reset()">Repeat</button>
   </div>
 
   <div #waveformContainer class="waveform"></div>
 
   <div class="actions">
 
-    <button (click)="assess()" [disabled]="assessmentLoading">
-      {{ assessmentLoading ? 'Assessing...' : 'Assess' }}
+
+    <button type="button" (click)="assess()" [disabled]="!recordedBlob && !trimmedBlob">
+      Assess My Recording
     </button>
     <button (click)="back.emit()">Back</button>
   </div>
@@ -44,10 +46,10 @@
     <h4>Assessment Result</h4>
     <p><strong>Expected:</strong> {{ assessmentResult?.expectedText }}</p>
 
-    <p><strong>Recognized:</strong> {{ assessmentResult.recognizedText }}</p>
-    <p><strong>Accuracy:</strong> {{ assessmentResult.accuracyScore }}</p>
-    <p><strong>Completeness:</strong> {{ assessmentResult.completenessScore }}</p>
-    <p><strong>Overall:</strong> {{ assessmentResult.overallScore }}</p>
+    <p><strong>Recognized:</strong> {{ assessmentResult?.recognizedText }}</p>
+    <p><strong>Accuracy:</strong> {{ assessmentResult?.accuracyScore }}</p>
+    <p><strong>Completeness:</strong> {{ assessmentResult?.completenessScore }}</p>
+    <p><strong>Overall:</strong> {{ assessmentResult?.overallScore }}</p>
 
     <div *ngIf="assessmentResult.feedback?.length">
       <p><strong>Feedback:</strong></p>
