@@ -85,4 +85,20 @@ spinner-container {
     transform: rotate(360deg);
   }
 }
-🧠
+🧠.debug-box {
+  margin-top: 12px;
+  padding: 12px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.debug-box pre {
+  white-space: pre-wrap;
+}
+
+.error {
+  color: #b91c1c;
+  font-weight: bold;
+}

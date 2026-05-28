@@ -10,7 +10,7 @@ import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js';
 import { UploadService } from '../../services/upload.service';
 import { AuthService } from '../../services/auth.service';
 
-
+import {environment} from '../../../environments/environment'
 @Component({
   selector: 'app-record',
   standalone: true,
@@ -267,6 +267,7 @@ export class Record implements OnInit, AfterViewInit {
         this.isUploading = false;
       },
       complete: () => {
+
         this.isUploading = false;
       }
     });
@@ -413,7 +414,7 @@ export class Record implements OnInit, AfterViewInit {
 
   playFromServer(recordingId: number) {
     const audio = new Audio();
-    const audioUrl = `http://localhost:8083/api/recordings/${recordingId}/stream`;
+    const audioUrl =`${environment.audioUrl}/api/recordings/${recordingId}/stream`;
 
     audio.src = audioUrl;
     audio.load();

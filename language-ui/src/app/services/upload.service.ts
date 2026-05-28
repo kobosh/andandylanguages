@@ -1,6 +1,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
+import {environment} from '../../environments/environment';
 
 export interface UploadWordResponse {
   id: number;
@@ -42,7 +43,7 @@ export class UploadService {
       );
 
     return this.http.post<UploadWordResponse>(
-      'http://localhost:8083/api/recordings/upload-word'
+      `${environment.audioUrl}/api/recordings/upload-word`
       ,
       formData
       , {
@@ -73,7 +74,7 @@ export class UploadService {
       throw new Error('Missing JWT token');
 
     return this.http.post(
-      'http://localhost:8083/api/recordings/upload-sentence',
+      `${environment.audioUrl}/api/recordings/upload-sentence`,
       formData,
       {
         headers: {
@@ -89,7 +90,7 @@ export class UploadService {
     formData.append('file', blob, 'learner.webm');
 
     const token = localStorage.getItem('token');
-    return this.http.post('http://localhost:8083/api/recordings/assess', formData, {
+    return this.http.post(`${environment.audioUrl}/api/recordings/assess`, formData, {
       headers: { Authorization: `Bearer ${token}` }
     });
   }

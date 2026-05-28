@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import {PracticeWordSentence} from '../practice-word-sentence/practice-word-sentence';
 
 import { AssessmentComponent } from '../assessment-component/assessment-component';
+import {environment} from '../../../environments/environment';
 
 export interface PracticeWord {
   id: number;
@@ -72,7 +73,7 @@ export class PracticeWordListComponent implements OnInit {
       return;
     }
     this.isUploading=true;
-    this.http.get<PracticeWord[]>(`http://localhost:8083/api/recordings/practice-words?dialect=${this.dialect}`,
+    this.http.get<PracticeWord[]>(`${environment.audioUrl}/api/recordings/practice-words?dialect=${this.dialect}`,
       {
         headers:{
           Authorization: `Bearer ${token}`
@@ -87,7 +88,7 @@ export class PracticeWordListComponent implements OnInit {
             this.selectedWord = items[0];
             this.isUploading=false;
           }
-          else { alert(" Not available ");}
+          else {  this.error=" Dialect Not available";}
 
 
         },

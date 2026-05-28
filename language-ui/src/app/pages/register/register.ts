@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router ,ActivatedRoute} from '@angular/router';
 
-
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -44,26 +44,21 @@ export class Register implements OnInit{
       return;
     }
 
-    this.http.post('http://localhost:8082/api/auth/register', {
+    this.http.post(`${environment.authUrl}/api/auth/register`, {
       email: this.email,
       password: this.password,
       name: this.name,
-      role: this.role
+      role: "learner"
     }).subscribe({
       next: () => {
 
         this.success = 'Registration successful! Redirecting...';
 
         setTimeout(() => {
-          if (this.role === 'contrib') {
-            console.log(this.role+"  demo record");
-            this.router.navigate(['/demo-record']);
-           }
 
-          else if (this.role === 'learner') {
             this.router.navigate(['/login'], {
               queryParams: { role: 'learner' }
-            });}
+            });
 
         }, 1500);
       },

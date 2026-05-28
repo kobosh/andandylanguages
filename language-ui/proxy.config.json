@@ -1,0 +1,31 @@
+{
+  "/auth-api": {
+  "target": "http://10.0.0.29:8082",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+    "^/auth-api": ""
+  }
+},
+
+  "/audio-api": {
+  "target": "http://10.0.0.29:8083",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+    "^/audio-api": ""
+  }
+},
+
+  "/pronunciation-api": {
+  "target": "http://10.0.0.29:8084",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+    "^/pronunciation-api": ""
+  }
+},
+  "server": {
+    "allowedHosts": ["squid-striving-vantage.ngrok-free.dev"]
+  }
+}

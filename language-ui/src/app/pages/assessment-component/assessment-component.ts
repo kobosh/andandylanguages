@@ -5,6 +5,7 @@ import {LoadingSpinnerComponent} from '../../shared/loading-spinner/loading-spin
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import { PracticeWord } from '../../model/PracticeWord'
+import {environment} from '../../../environments/environment';
 
 interface AssessmentResponse {
   recognizedText: string;
@@ -40,7 +41,7 @@ export class AssessmentComponent implements AfterViewInit {
   audioUrl: string | null = null;
   nowPlaying: string | null = null;
   hasRegion: boolean | null = null;
-
+  startrecording=true;
   assessmentLoading = false;
   assessmentError = '';
   assessmentResult: AssessmentResponse | null = null;
@@ -132,8 +133,136 @@ export class AssessmentComponent implements AfterViewInit {
       this.hasRegion = Object.keys(this.regionsPlugin.getRegions()).length > 0;
     });
   }
+  recordingDebug = '';
+  recordingError = '';
+  //startrecording = false;
+
+  private addDebug(msg: string) {
+    this.recordingDebug += `${new Date().toLocaleTimeString()} - ${msg}\n`;
+  }
+
+  private getSupportedMimeType(): string {
+    const types = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/mp4',
+      'audio/aac'
+    ];
+
+    for (const type of types) {
+      if (MediaRecorder.isTypeSupported(type)) {
+        return type;
+      }
+    }
+
+    return '';
+  }
 
   async start() {
+    this.startrecording = true;
+    this.recordingError = '';
+    this.recordingDebug = '';
+
+     try {
+    //   this.addDebug('Start button clicked');
+    //
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('getUserMedia is not available. Use Safari with HTTPS or localhost.');
+      }
+
+      if (!window.MediaRecorder) {
+        throw new Error('MediaRecorder is not supported on this iPhone/Safari.');
+      }
+
+      const mimeType = this.getSupportedMimeType();
+     // this.addDebug('Supported mimeType: ' + (mimeType || 'browser default'));
+
+      this.recordedChunks = [];
+      this.recordedBlob = null;
+      this.trimmedBlob = null;
+      this.hasRegion = false;
+      this.nowPlaying = null;
+      this.assessmentError = '';
+      this.assessmentResult = null;
+
+     // this.addDebug('Requesting microphone permission...');
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+     // this.addDebug('Microphone permission granted');
+
+      this.recorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
+
+      //this.addDebug('Recorder created with: ' + this.recorder.mimeType);
+
+      this.recorder.ondataavailable = (e) => {
+        //this.addDebug('Data available size: ' + e.data.size);
+        if (e.data.size > 0) {
+          this.recordedChunks.push(e.data);
+        }
+      };
+
+      this.recorder.onerror = (e: any) => {
+        this.recordingError = 'Recorder error: ' + (e.error?.message || e.message || e);
+       // this.addDebug(this.recordingError);
+      };
+
+      this.recorder.start();
+      //this.addDebug('Recording started');
+    } catch (err: any) {
+      this.recordingError = err?.message || String(err);
+      //this.addDebug('ERROR: ' + this.recordingError);
+      this.startrecording = false;
+    }
+  }
+
+  async stop() {
+    try {
+      //this.addDebug('Stop button clicked');
+
+      if (!this.recorder) {
+        throw new Error('No recorder exists.');
+      }
+
+      if (this.recorder.state !== 'recording') {
+        throw new Error('Recorder is not recording. Current state: ' + this.recorder.state);
+      }
+
+      this.recorder.stop();
+
+      await new Promise<void>((resolve) => {
+        this.recorder!.onstop = () => {
+         // this.addDebug('Recorder stopped');
+          resolve();
+        };
+      });
+
+      const type = this.recorder.mimeType || 'audio/webm';
+      this.recordedBlob = new Blob(this.recordedChunks, { type });
+
+     // this.addDebug('Blob created. Size: ' + this.recordedBlob.size + ', type: ' + type);
+
+      if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
+      this.audioUrl = URL.createObjectURL(this.recordedBlob);
+
+      this.trimmedBlob = null;
+      this.hasRegion = false;
+      this.nowPlaying = null;
+
+      this.regionsPlugin.clearRegions();
+      this.waveSurfer.load(this.audioUrl);
+
+      this.recorder.stream.getTracks().forEach(t => t.stop());
+      //this.addDebug('Microphone released');
+    } catch (err: any) {
+      this.recordingError = err?.message || String(err);
+      //this.addDebug('ERROR: ' + this.recordingError);
+    }
+  }
+ /* async start() {
+    this.startrecording=true;
+    console.log(this.startrecording);
+
     this.recordedChunks = [];
     this.recordedBlob = null;
     this.trimmedBlob = null;
@@ -172,7 +301,7 @@ export class AssessmentComponent implements AfterViewInit {
 
     this.regionsPlugin.clearRegions();
     this.waveSurfer.load(this.audioUrl);
-  }
+  }*/
 
   playOriginal() {
     if (!this.recordedBlob) return;
@@ -201,87 +330,7 @@ export class AssessmentComponent implements AfterViewInit {
     });
   }
 
- /* async trimOnly() {
-    if (!this.recordedBlob) {
-      alert('Nothing to trim');
-      return;
-    }
 
-    const regions = Object.values(this.regionsPlugin.getRegions());
-    if (regions.length === 0) {
-      alert('Please select a region on the waveform');
-      return;
-    }
-
-    const { start, end }: any = regions[0];
-
-    const ctx = new AudioContext();
-    const buffer = await ctx.decodeAudioData(await this.recordedBlob.arrayBuffer());
-
-    const startSample = Math.floor(start * buffer.sampleRate);
-    const endSample = Math.floor(end * buffer.sampleRate);
-
-    const trimmed = ctx.createBuffer(
-      buffer.numberOfChannels,
-      endSample - startSample,
-      buffer.sampleRate
-    );
-
-    for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
-      trimmed.getChannelData(ch).set(
-        buffer.getChannelData(ch).slice(startSample, endSample)
-      );
-    }
-
-    this.trimmedBlob = this.encodeWav(trimmed);
-
-    if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
-    this.audioUrl = URL.createObjectURL(this.trimmedBlob);
-
-    this.regionsPlugin.clearRegions();
-    this.waveSurfer.load(this.audioUrl);
-
-    this.hasRegion = false;
-    this.nowPlaying = 'Trimmed';
-  }*/
-
- /* encodeWav(buffer: AudioBuffer): Blob {
-    const samples = buffer.getChannelData(0);
-    const ab = new ArrayBuffer(44 + samples.length * 2);
-    const view = new DataView(ab);
-
-    let o = 0;
-    const w = (s: string) => [...s].forEach((c) => view.setUint8(o++, c.charCodeAt(0)));
-
-    w('RIFF');
-    view.setUint32(o, 36 + samples.length * 2, true);
-    o += 4;
-    w('WAVEfmt ');
-    view.setUint32(o, 16, true);
-    o += 4;
-    view.setUint16(o, 1, true);
-    o += 2;
-    view.setUint16(o, 1, true);
-    o += 2;
-    view.setUint32(o, buffer.sampleRate, true);
-    o += 4;
-    view.setUint32(o, buffer.sampleRate * 2, true);
-    o += 4;
-    view.setUint16(o, 2, true);
-    o += 2;
-    view.setUint16(o, 16, true);
-    o += 2;
-    w('data');
-    view.setUint32(o, samples.length * 2, true);
-    o += 4;
-
-    samples.forEach((s) => {
-      view.setInt16(o, s * 0x7fff, true);
-      o += 2;
-    });
-
-    return new Blob([view], { type: 'audio/wav' });
-  }*/
   assess(): void {
     if (!this.item) {
       this.assessmentError = 'No practice item selected.';
@@ -324,7 +373,7 @@ export class AssessmentComponent implements AfterViewInit {
 
     this.isPreparingTranscript = true;
 
-    this.http.get(`http://localhost:8083${audioUrl}`, {
+    this.http.get(`${environment.audioUrl}${audioUrl}`, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${token}`
       }),
@@ -374,7 +423,7 @@ export class AssessmentComponent implements AfterViewInit {
     const token = localStorage.getItem('token');
 
     this.http.post<{ recordingId: string; transcript: string }>(
-      'http://localhost:8084/api/pronunciation/transcribe',
+      `${environment.pronunciationUrl}/api/pronunciation/transcribe`,
       formData,
       token
         ? {
@@ -407,6 +456,13 @@ export class AssessmentComponent implements AfterViewInit {
       },
       error: (err) => {
         console.error('Transcription failed', err);
+        console.error('🔥 Transcription failed', err);
+
+        console.log('STATUS', err.status);
+        console.log('MESSAGE', err.message);
+        console.log('ERROR', err.error);
+
+
         this.assessmentError = 'Transcription failed.';
         this.isPreparingTranscript = false;
         this.assessmentLoading = false;
@@ -436,7 +492,7 @@ export class AssessmentComponent implements AfterViewInit {
     const token = localStorage.getItem('token');
 
     this.http.post<AssessmentResponse>(
-      'http://localhost:8084/api/pronunciation/assess',
+      `${environment.pronunciationUrl}/api/pronunciation/assess`,
       formData,
       token
         ? {

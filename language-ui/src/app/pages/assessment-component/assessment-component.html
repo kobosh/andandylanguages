@@ -16,14 +16,25 @@
   </p>
 
   <div class="actions">
+<!--    <button (click)="startRecording()">-->
+<!--      Record-->
+<!--    </button>-->
     <button (click)="start()">Record</button>
+    <p *ngIf(startedrecording)> starting record {{startrecording}}</p>
     <button (click)="stop()">Stop</button>
     <button (click)="playOriginal()" [disabled]="!recordedBlob">Play Original</button>
-<!--    <button (click)="trimOnly()" [disabled]="!recordedBlob">Trim</button>-->
-<!--    <button (click)="playTrimmed()" [disabled]="!trimmedBlob">Play Trimmed</button>-->
+
     <button class="btn secondary" (click)="reset()">Repeat</button>
   </div>
+  <div class="debug-box">
+    <p><strong>Recording debug:</strong></p>
 
+    <p *ngIf="recordingError" class="error">
+      {{ recordingError }}
+    </p>
+
+    <pre>{{ recordingDebug }}</pre>
+  </div>
   <div #waveformContainer class="waveform"></div>
 
   <div class="actions">

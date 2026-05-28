@@ -7,6 +7,7 @@ import { RouterLink } from '@angular/router';
 import {FormBuilder,FormGroup,ReactiveFormsModule} from "@angular/forms"
 import {DemoRecordComponent} from '../demo-record/demo-record';
 import {IdleService} from '../../services/IdleService';
+import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -21,6 +22,7 @@ export class Login implements OnInit{
   error: string = '';
   private role:string='';
    loginForm : FormGroup;
+  protected errorMessage: string | undefined;
 
 
   constructor(
@@ -42,8 +44,8 @@ export class Login implements OnInit{
     }
 
   login() {
-
-    this.http.post('http://localhost:8082/api/auth/login',
+        console.log("LOG IN!!!!");
+    this.http.post(`${environment.authUrl}/api/auth/login`,
       {
       email: this.email,
       password: this.password,
@@ -73,8 +75,12 @@ export class Login implements OnInit{
         }, 1500);
 
       },
-      error: () => {
-        this.error = 'Invalid email or password';
+      error: (err) =>{
+          console.log('LOGIN ERROR', err);
+          this.errorMessage =
+            `Login failed. Status=${err.status}, message=${err.message},email=${this.email}`;
+
+
       }
     });
   }

@@ -58,7 +58,9 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-
+          "options": {
+            "allowedHosts": ["squid-striving-vantage.ngrok-free.dev"]
+          },
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
@@ -98,4 +100,4 @@
   "cli": {
     "analytics": "d9d1deaf-2ac0-4ac9-808b-71b3124f56ce"
   }
-}
+  }

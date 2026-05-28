@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { PracticeWord } from '../../model/PracticeWord';
 import {LoadingSpinnerComponent} from '../../shared/loading-spinner/loading-spinner';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-practice-word-sentence',
@@ -60,7 +61,7 @@ export class PracticeWordSentence {
     this.stopCurrentAudio();
 
 
-    this.http.get(`http://localhost:8083${audioUrl}`, {
+    this.http.get(`${environment.audioUrl}${audioUrl}`, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${token}`
       }),

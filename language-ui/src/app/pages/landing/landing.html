@@ -1,24 +1,101 @@
-<div class="landing-page">
-  <section class="hero">
-    <h1>Andandy Languages</h1>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8" />-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0" />-->
+<!--  <title>Andandy Languages — Preserving Voices</title>-->
 
+<!--</head>-->
+<!--<body>-->
+
+<header class="navbar">
+  <div class="logo">Andandy Languages</div>
+
+  <button
+    class="menu-btn"
+    type="button"
+    aria-label="Open menu"
+    (click)="toggleMenu()">
+    ☰
+  </button>
+
+  <nav class="nav-links" [class.open]="menuOpen">
+    <a href="#mission" (click)="menuOpen = false">Mission</a>
+    <a routerLink="/record" (click)="menuOpen = false">Record</a>
+    <a routerLink="/login" (click)="menuOpen = false">Login</a>
+    <a routerLink="/register" class="cta" (click)="menuOpen = false">Join</a>
+  </nav>
+</header>
+
+
+<section class="hero">
+  <div class="container">
+    <h1>Preserving Nubian Languages<br>One Voice at a Time</h1>
     <p>
-      Help preserve Nubian languages through voice recordings,
-      or practice pronunciation as a learner.
+      Languages disappear when voices are lost.
+      Andandy Languages is a community-driven effort to preserve endangered
+      Nubian languages through authentic voice recordings.
     </p>
 
-    <div class="actions">
-      <a routerLink="/register" [queryParams]="{ role: 'contrib' }">
-        Register as Contributor
-      </a>
+  </div>
+</section>
 
-      <a routerLink="/register" [queryParams]="{ role: 'learner' }">
-        Register as Learner
-      </a>
+<section id="mission" class="section">
+  <div class="container">
+    <h2>Our Mission</h2>
+    <p>
+      Many Nubian languages are passed down orally and remain undocumented.
+      When elders pass away, pronunciation, usage, and meaning are often lost forever.
+    </p>
+    <p>
+      Andandy Languages exists to preserve these voices — recorded directly
+      from native speakers — for education, research, and future generations.
+    </p>
+  </div>
+</section>
 
-      <a routerLink="/login">
-        Already have an account? Login
-      </a>
+
+
+
+
+<section class="section alt">
+  <div class="container">
+    <h2>How It Works</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>1. Register</h3>
+        <p>Create a free account to become a contributor.</p>
+      </div>
+      <div class="step">
+        <h3>2. Record</h3>
+        <p>Record a word, its meaning, and its pronunciation. Use word in short sentence</p>
+      </div>
+      <div class="step">
+        <h3>3. Preserve</h3>
+        <p>Your voice becomes part of a permanent cultural archive.</p>
+      </div>
     </div>
-  </section>
-</div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2>Community Values</h2>
+    <ul class="values">
+      <li>🌍 Cultural respect and authenticity</li>
+      <li>🤝 Community-led contributions</li>
+      <li>🎓 Educational and non-commercial use</li>
+      <li>🔓 Open and transparent technology</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>Andandy Languages is a community preservation initiative.</p>
+    <p>Contact: info@andandylanguages.org</p>
+  </div>
+</footer>
+
+<!--</body>-->
+<!--</html>-->
