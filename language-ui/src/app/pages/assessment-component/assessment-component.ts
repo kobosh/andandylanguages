@@ -137,9 +137,7 @@ export class AssessmentComponent implements AfterViewInit {
   recordingError = '';
   //startrecording = false;
 
-  private addDebug(msg: string) {
-    this.recordingDebug += `${new Date().toLocaleTimeString()} - ${msg}\n`;
-  }
+
 
   private getSupportedMimeType(): string {
     const types = [
@@ -164,8 +162,7 @@ export class AssessmentComponent implements AfterViewInit {
     this.recordingDebug = '';
 
      try {
-    //   this.addDebug('Start button clicked');
-    //
+
       if (!navigator.mediaDevices?.getUserMedia) {
         throw new Error('getUserMedia is not available. Use Safari with HTTPS or localhost.');
       }
@@ -175,7 +172,7 @@ export class AssessmentComponent implements AfterViewInit {
       }
 
       const mimeType = this.getSupportedMimeType();
-     // this.addDebug('Supported mimeType: ' + (mimeType || 'browser default'));
+
 
       this.recordedChunks = [];
       this.recordedBlob = null;
@@ -185,18 +182,17 @@ export class AssessmentComponent implements AfterViewInit {
       this.assessmentError = '';
       this.assessmentResult = null;
 
-     // this.addDebug('Requesting microphone permission...');
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-     // this.addDebug('Microphone permission granted');
+
 
       this.recorder = mimeType
         ? new MediaRecorder(stream, { mimeType })
         : new MediaRecorder(stream);
 
-      //this.addDebug('Recorder created with: ' + this.recorder.mimeType);
 
       this.recorder.ondataavailable = (e) => {
-        //this.addDebug('Data available size: ' + e.data.size);
+
         if (e.data.size > 0) {
           this.recordedChunks.push(e.data);
         }
@@ -204,21 +200,21 @@ export class AssessmentComponent implements AfterViewInit {
 
       this.recorder.onerror = (e: any) => {
         this.recordingError = 'Recorder error: ' + (e.error?.message || e.message || e);
-       // this.addDebug(this.recordingError);
+
       };
 
       this.recorder.start();
-      //this.addDebug('Recording started');
+
     } catch (err: any) {
       this.recordingError = err?.message || String(err);
-      //this.addDebug('ERROR: ' + this.recordingError);
+
       this.startrecording = false;
     }
   }
 
   async stop() {
     try {
-      //this.addDebug('Stop button clicked');
+
 
       if (!this.recorder) {
         throw new Error('No recorder exists.');
@@ -232,7 +228,7 @@ export class AssessmentComponent implements AfterViewInit {
 
       await new Promise<void>((resolve) => {
         this.recorder!.onstop = () => {
-         // this.addDebug('Recorder stopped');
+
           resolve();
         };
       });
@@ -240,7 +236,7 @@ export class AssessmentComponent implements AfterViewInit {
       const type = this.recorder.mimeType || 'audio/webm';
       this.recordedBlob = new Blob(this.recordedChunks, { type });
 
-     // this.addDebug('Blob created. Size: ' + this.recordedBlob.size + ', type: ' + type);
+
 
       if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
       this.audioUrl = URL.createObjectURL(this.recordedBlob);
@@ -253,55 +249,13 @@ export class AssessmentComponent implements AfterViewInit {
       this.waveSurfer.load(this.audioUrl);
 
       this.recorder.stream.getTracks().forEach(t => t.stop());
-      //this.addDebug('Microphone released');
+
     } catch (err: any) {
       this.recordingError = err?.message || String(err);
-      //this.addDebug('ERROR: ' + this.recordingError);
+
     }
   }
- /* async start() {
-    this.startrecording=true;
-    console.log(this.startrecording);
 
-    this.recordedChunks = [];
-    this.recordedBlob = null;
-    this.trimmedBlob = null;
-    this.hasRegion = false;
-    this.nowPlaying = null;
-    this.assessmentError = '';
-    this.assessmentResult = null;
-
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-    this.recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-
-    this.recorder.ondataavailable = (e) => {
-      if (e.data.size > 0) {
-        this.recordedChunks.push(e.data);
-      }
-    };
-
-    this.recorder.start();
-  }
-
-  async stop() {
-    if (!this.recorder || this.recorder.state !== 'recording') return;
-
-    this.recorder.stop();
-    await new Promise<void>((resolve) => (this.recorder!.onstop = () => resolve()));
-
-    this.recordedBlob = new Blob(this.recordedChunks, { type: 'audio/webm' });
-
-    if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
-    this.audioUrl = URL.createObjectURL(this.recordedBlob);
-
-    this.trimmedBlob = null;
-    this.hasRegion = false;
-    this.nowPlaying = null;
-
-    this.regionsPlugin.clearRegions();
-    this.waveSurfer.load(this.audioUrl);
-  }*/
 
   playOriginal() {
     if (!this.recordedBlob) return;

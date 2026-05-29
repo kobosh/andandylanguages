@@ -32,7 +32,7 @@ public class AppUser {
 
     @NotBlank
     @Column(nullable = false)
-    private String role ;// = "ROLE_USER";
+    private String role = "learner";
 
     public AppUser() {}
 

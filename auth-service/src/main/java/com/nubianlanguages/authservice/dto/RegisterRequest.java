@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 
 public class RegisterRequest {
-    public RegisterRequest() {System.out.println("in registerrequest");}
+    public RegisterRequest() { /* TODO document why this constructor is empty */ }
 
 
     @Email

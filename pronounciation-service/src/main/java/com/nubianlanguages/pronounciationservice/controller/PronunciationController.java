@@ -39,7 +39,7 @@ private  final WhisperSpeechService whisperSpeechService;
             @RequestParam(value = "languageCode", required = false, defaultValue = "sw") String languageCode,
             @RequestParam(value = "recordingId", required = false) Long recordingId
     ) throws Exception {
-            System.out.println("CALLING Contrl transcribe "+audio.getOriginalFilename());
+           // System.out.println("CALLING Contrl transcribe "+audio.getOriginalFilename());
         if (audio == null || audio.isEmpty()) {
             throw new IllegalArgumentException("Audio file is required");
         }
