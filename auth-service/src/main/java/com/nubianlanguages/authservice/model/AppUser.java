@@ -6,11 +6,19 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
+
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "email")
+        }
+)
 public class AppUser {
 
     @Id
@@ -33,7 +41,11 @@ public class AppUser {
     @NotBlank
     @Column(nullable = false)
     private String role = "learner";
+    private boolean mustChangePassword = false;
 
+    private String passwordResetToken;
+
+    private LocalDateTime passwordResetTokenExpiresAt;
     public AppUser() {}
 
     public AppUser(String username,String email, String password, String role) {
@@ -43,4 +55,5 @@ public class AppUser {
         this.password = password;
         this.role = role;
     }
+
 }

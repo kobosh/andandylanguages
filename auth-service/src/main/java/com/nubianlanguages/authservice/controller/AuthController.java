@@ -1,7 +1,6 @@
 package com.nubianlanguages.authservice.controller;
 
-import com.nubianlanguages.authservice.dto.LoginRequest;
-import com.nubianlanguages.authservice.dto.RegisterRequest;
+import com.nubianlanguages.authservice.dto.*;
 import com.nubianlanguages.authservice.model.AppUser;
 import com.nubianlanguages.authservice.repository.UserRepository;
 import com.nubianlanguages.authservice.security.JwtService;
@@ -14,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -65,7 +66,9 @@ public class AuthController {
                Map.of(
                        "accessToken", token,
                        "expiresIn", expirationMs / 1000,
-                       "role", user.getRole()
+                       "role", user.getRole(),
+                       "mustChangePassword", user.isMustChangePassword(),
+                       "email",request.getEmail()
                )
        );
    }
@@ -115,6 +118,78 @@ public class AuthController {
                )
        );
    }
+    @PostMapping("/admin/create-user")
+    public ResponseEntity<?> adminCreateUser(@RequestBody AdminCreateUserRequest req) {
+
+        AppUser user = new AppUser();
+        user.setFullname(req.getFullName());
+        user.setEmail(req.getEmail());
+        user.setRole(String.valueOf(req.getRole())); // CONTRIBUTOR or LEARNER
+        user.setPassword(passwordEncoder.encode(req.getTemporaryPassword()));
+        user.setMustChangePassword(true);
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User created successfully");
+    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+System.out.println("EMAIL "+request.getEmail());
+        Optional<AppUser> optionalUser = userRepository.findByEmail(request.getEmail());
+
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.ok("If email does not exist, reset link was not sent");
+        }
+
+        AppUser user = optionalUser.get();
+
+        String token = UUID.randomUUID().toString();
+
+        user.setPasswordResetToken(token);
+        user.setPasswordResetTokenExpiresAt(LocalDateTime.now().plusMinutes(30));
+        System.out.println("New Password "+request.getPassword());
+        if(request.getPassword()!=null)
+        { user.setPassword(request.getPassword());
+           userRepository.save(user);}
+
+        System.out.println(
+                "RESET LINK: http://localhost:4200/forgot-password?token=" + token
+        );
+
+        return ResponseEntity.ok(" email exists, reset link was sent");
+    }
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        System.out.println("old pass"+request.getOldPassword());
+        Optional<AppUser> optionalUser =
+                userRepository.findByEmail(request.getEmail());
+
+        if (optionalUser.isEmpty()) {
+            System.out.println("If old password exists, reset link was sent");
+            return ResponseEntity
+                    .badRequest()
+                    .body("Invalid reset token");
+        }
+
+        AppUser user = optionalUser.get();
+
+        /*if (user.getPasswordResetTokenExpiresAt() == null ||
+                user.getPasswordResetTokenExpiresAt().isBefore(LocalDateTime.now())) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body("Reset token expired");
+        }*/
+
+        user.setPassword(request.getNewPassword()); // plain password for now
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiresAt(null);
+        user.setMustChangePassword(false);
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password reset successfully");
+    }
 
 }
 

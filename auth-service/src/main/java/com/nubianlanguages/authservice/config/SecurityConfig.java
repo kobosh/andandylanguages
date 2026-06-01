@@ -35,9 +35,13 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
+                                "/api/auth/forgot-password",
+                                "/api/auth/change-password",
+
                                 "/.well-known/jwks.json",
                                 "/h2-console/**"
                         ).permitAll()
+                        .requestMatchers("/api/auth/admin/**").hasAuthority("ADMIN")
                         .anyRequest().denyAll()
                 )
                 .headers(headers ->
@@ -79,54 +83,3 @@ public class SecurityConfig {
     }
 }
 
-/*@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:4200",
-                "http://10.0.0.29:4200"
-        ));
-
-        http
-                // 🔴 FORCE this chain to apply to ALL requests
-                .securityMatcher("/**")
-                .cors(Customizer.withDefaults())
-
-                // 🔴 CSRF MUST be disabled for POST APIs
-                .csrf(csrf -> csrf.disable())
-
-                // 🔴 NO sessions, NO login pages
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable())
-
-                // 🔴 Explicit authorization rules  .requestMatchers("/api/recordings/**").authenticated();
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/recordings/**",
-                                "/api/auth/register",
-                                "/api/auth/login",
-                                "/.well-known/jwks.json",
-                                "/h2-console/**"
-                        ).permitAll()
-                        .anyRequest().denyAll()
-                )
-
-                // 🔴 Required for H2 console
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
-
-        return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-}*/

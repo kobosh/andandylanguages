@@ -1,6 +1,19 @@
 import { Routes } from '@angular/router';
 
+
 export const routes: Routes = [
+  {
+    path: 'change-password',
+    loadComponent: () =>
+      import('./pages/change-password/change-password')
+        .then(m => m.ChangePassword)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./pages/reset-password/reset-password')
+        .then(m => m.ResetPassword)
+  },
 {
     path: '',
     loadComponent: () =>

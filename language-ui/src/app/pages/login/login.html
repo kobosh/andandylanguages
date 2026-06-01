@@ -25,7 +25,17 @@
           {{ errorMessage }}
         </p>
       </form>
+      <button type="button" (click)="forgotPassword()">
+        Forgot password?
+      </button>
 
+      <p *ngIf="forgotPasswordMessage" class="success">
+        {{ forgotPasswordMessage }}
+      </p>
+
+      <p *ngIf="errorMessage" class="error">
+        {{ errorMessage }}
+      </p>
       <p>Don't have an account? <a routerLink="/register">Register</a></p>
     </div>
   </div>
