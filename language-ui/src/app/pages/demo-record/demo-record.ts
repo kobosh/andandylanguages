@@ -20,36 +20,30 @@ import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js' ;
   styleUrls: ['./demo-record.css']
 })
 export class DemoRecordComponent implements AfterViewInit,OnInit {
-  hasRecorded = false;
-  hasSelectedRegion = false;
-  hasTrimmed = false;
-  showDragHint = true;
+
   canPlayOriginal = false;
   canPlayTrimmed = false;
-
-
   @ViewChild('waveform') waveform!: ElementRef<HTMLDivElement>;
-
   waveSurfer!: WaveSurfer;
   regions!: RegionsPlugin;
-
   recorder: MediaRecorder | null = null;
   recordedChunks: BlobPart[] = [];
   recordedBlob: Blob | null = null;
   trimmedBlob: Blob | null = null;
-
   isRecording = false;
-  protected usageSentence: string='';
-  role = '';
 
   constructor(private readonly route: ActivatedRoute) {}
+  role: 'contrib' | 'learner' = 'learner';
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.role = params['role'] || 'contrib';
-    });
-  }
+    const savedRole = localStorage.getItem('role');
 
+      this.role =
+      savedRole === 'contrib' || savedRole === 'contrib'
+          ? 'contrib'
+          : 'learner';
+
+  }
   ngAfterViewInit() {
     //console.log('waveform native element:', this.waveform?.nativeElement);
     // ✅ create regions plugin

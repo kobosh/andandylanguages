@@ -1,8 +1,6 @@
 package com.nubianlanguages.audioservices.service;
 
-import com.nubianlanguages.audioservices.dto.PracticeItemResponse;
-import com.nubianlanguages.audioservices.dto.PracticeItemSummaryResponse;
-import com.nubianlanguages.audioservices.dto.UploadResponse;
+import com.nubianlanguages.audioservices.dto.UploadResponseXX;
 import com.nubianlanguages.audioservices.repository.RecordingRepository;
 import io.minio.*;
 
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -70,7 +67,7 @@ public class AudioService {
         }
     }
 
-    public UploadResponse uploadAudio(MultipartFile file) throws Exception {
+    public UploadResponseXX uploadAudio(MultipartFile file) throws Exception {
 
         String objectName =
                 "audio/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
@@ -90,7 +87,7 @@ public class AudioService {
         String fileUrl =
                 minioUrl + "/" + bucketName + "/" + objectName;
 
-        return new UploadResponse(objectName, fileUrl);
+        return new UploadResponseXX(objectName, fileUrl);
     }
 
 }

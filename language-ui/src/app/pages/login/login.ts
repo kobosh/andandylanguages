@@ -66,7 +66,7 @@ export class Login implements OnInit {
         if (resp.role === 'contrib' || resp.role === 'CONTRIB' || resp.role === 'CONTRIBUTOR') {
           this.router.navigate(['/record']);
         } else if (resp.role === 'learner' || resp.role === 'LEARNER') {
-          this.router.navigate(['/learner']);
+          this.router.navigate(['/demorecord']);
         } else {
           this.router.navigate(['/login']);
         }

@@ -5,16 +5,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PublicWordResponse {
+public class PublicWordResponseXX {
     private Long id;
     private String word;
     private String meaning;
     private String audioUrl;
 
-    public PublicWordResponse() {
+    public PublicWordResponseXX() {
     }
 
-    public PublicWordResponse(Long id, String word, String meaning, String audioUrl) {
+    public PublicWordResponseXX(Long id, String word, String meaning, String audioUrl) {
         this.id = id;
         this.word = word;
         this.meaning = meaning;

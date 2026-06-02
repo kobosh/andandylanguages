@@ -1,10 +1,19 @@
 <div class="demo-box" >
   <div>
 
-  <h3>🎧 Practice Recording Or login to  record a word </h3>
-    <a [routerLink]="['/login']" [queryParams]="{ role: role }">
-      Log in to record audio
-    </a>
+    <h3>🎧 Already know how to record audio?</h3>
+
+    <div *ngIf="role === 'contrib'">
+      <button type="button" routerLink="/record">
+        Skip Tutorial
+      </button>
+    </div>
+
+    <div *ngIf="role === 'learner'">
+      <button type="button" routerLink="/practice">
+        Skip Tutorial
+      </button>
+    </div>
     <p class="hint">
       this is how  recorded audio  will look like</p>
       <img src="/images/recordedaudio.png" alt=" not found">

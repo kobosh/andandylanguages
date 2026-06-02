@@ -1,6 +1,6 @@
 package com.nubianlanguages.audioservices.service;
 
-import com.nubianlanguages.audioservices.dto.PublicWordResponse;
+import com.nubianlanguages.audioservices.dto.PublicWordResponseXX;
 import com.nubianlanguages.audioservices.entity.Recording;
 import com.nubianlanguages.audioservices.repository.RecordingRepository;
 import org.springframework.stereotype.Service;
@@ -16,9 +16,9 @@ public class PublicCatalogService {
         this.recordingRepository = recordingRepository;
     }
 
-    public List<PublicWordResponse> getPublicWords() {
+    public List<PublicWordResponseXX> getPublicWords() {
         List<Recording> recordings = recordingRepository.findAll();
-        List<PublicWordResponse> result = new ArrayList<>();
+        List<PublicWordResponseXX> result = new ArrayList<>();
 
         for (Recording rec : recordings) {
             if (rec.getWordObjectKey() == null || rec.getWordObjectKey().isBlank()) {
@@ -27,7 +27,7 @@ public class PublicCatalogService {
 
             String audioUrl = "http://localhost:8083/api/recordings/" + rec.getId() + "/word-audio";
 
-            result.add(new PublicWordResponse(
+            result.add(new PublicWordResponseXX(
                     rec.getId(),
                     rec.getWord(),
                     rec.getMeaning(),

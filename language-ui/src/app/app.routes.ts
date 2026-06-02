@@ -40,5 +40,10 @@ export const routes: Routes = [
   },
 
   { path: 'record', loadComponent: () =>
-      import('./pages/record/record').then(m => m.Record) }
+      import('./pages/record/record').then(m => m.Record) },
+  {path: 'demorecord',loadComponent:()=>import('./pages/demo-record/demo-record')
+      .then(m=>m.DemoRecordComponent)},
+  {path: 'practice',
+    loadComponent:()=>import('./pages/practice-word-list/practice-word-list')
+      .then(m=>m.PracticeWordListComponent)}
 ];

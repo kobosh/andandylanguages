@@ -5,7 +5,7 @@ import com.nubianlanguages.audioservices.entity.Dialect;
 import com.nubianlanguages.audioservices.entity.Recording;
 import com.nubianlanguages.audioservices.repository.RecordingRepository;
 import com.nubianlanguages.audioservices.service.MinioStorageService;
-import com.nubianlanguages.audioservices.service.PronunciationAssessmentService;
+//import com.nubianlanguages.audioservices.service.PronunciationAssessmentService;
 import com.nubianlanguages.audioservices.service.RecordingService;
 import com.nubianlanguages.audioservices.service.StorageService;
 import jakarta.annotation.PostConstruct;
@@ -36,7 +36,7 @@ public class RecordingController {
     private final RecordingService recordingService;
     private final RecordingRepository recordingRepository;
     private final StorageService storageService;
-    private final  PronunciationAssessmentService  pronunciationAssessmentService;
+    //private final  PronunciationAssessmentService  pronunciationAssessmentService;
 
     @Value("${minio.bucket.word}")
     private String wordbucket;
@@ -48,13 +48,14 @@ public class RecordingController {
             MinioStorageService minioStorageService,
             RecordingService recordingService,
             RecordingRepository recordingRepository,
-            StorageService storageService, PronunciationAssessmentService pronunciationAssessmentService
+            StorageService storageService
+            //, PronunciationAssessmentService pronunciationAssessmentService
     ) {
         this.minioStorageService = minioStorageService;
         this.recordingService = recordingService;
         this.recordingRepository = recordingRepository;
         this.storageService = storageService;
-        this.pronunciationAssessmentService = pronunciationAssessmentService;
+       // this.pronunciationAssessmentService = pronunciationAssessmentService;
     }
 
 
@@ -251,7 +252,7 @@ System.out.println("record id: "+saved.getId());//this prints id correctly
         }
         return rec.getWordObjectKey();
     }
-    @PostMapping(value = "/assess", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    /*@PostMapping(value = "/assess", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> assessLearnerAudio(
             @RequestParam("recordingId") Long recordingId,
             @RequestParam("mode") String mode, // WORD or SENTENCE
@@ -265,7 +266,7 @@ System.out.println("record id: "+saved.getId());//this prints id correctly
                 pronunciationAssessmentService.assess(recordingId, userId, mode, file);
 
         return ResponseEntity.ok(response);
-    }
+    }*/
 }
 
 
