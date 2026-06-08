@@ -9,8 +9,26 @@
       <option [ngValue]="null">-- Select Dialect --</option>
       <option *ngFor="let d of dialects" [value]="d">{{ d }}</option>
     </select>
+    <input
+      type="text"
+      [(ngModel)]="numberOfRecordings"
+      name="numberOfRecordings"
+      (input)="onNumberChange($event)"
+      required
+      #numberOfRecordingsModel="ngModel"
+      [class.error-input]="numberOfRecordingsModel.invalid && numberOfRecordingsModel.touched"
+      placeholder="number of recordings you wish to do now"
+    />
+
 
   </div>
+<div >
+  <app-content-range
+    *ngIf="numberOfRecordings > 0"
+    [numberOfRecordings]="numberOfRecordings"
+    (contentLoaded)="onContentLoaded($event)">
+  </app-content-range>
+</div>
 
   <section class="hero" *ngIf="dialect">
 

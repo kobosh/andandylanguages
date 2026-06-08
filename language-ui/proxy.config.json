@@ -25,6 +25,14 @@
     "^/pronunciation-api": ""
   }
 },
+  "/content-api": {
+    "target": "http://10.0.0.29:8085",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/content-api": ""
+    }
+  },
   "server": {
     "allowedHosts": ["squid-striving-vantage.ngrok-free.dev"]
   }

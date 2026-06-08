@@ -3,6 +3,18 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
+    path: 'contributor-content',
+    loadComponent: () =>
+      import('./pages/content-range/content-range')
+        .then(m => m.ContentRangeComponent)
+  },
+  {
+    path: 'learner-content',
+    loadComponent: () =>
+      import('./pages/content-range/content-range')
+        .then(m => m.ContentRangeComponent)
+  },
+  {
     path: 'change-password',
     loadComponent: () =>
       import('./pages/change-password/change-password')

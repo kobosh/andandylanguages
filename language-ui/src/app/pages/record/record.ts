@@ -9,16 +9,25 @@ import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js';
 
 import { UploadService } from '../../services/upload.service';
 import { AuthService } from '../../services/auth.service';
-
-import {environment} from '../../../environments/environment'
+import { Router, ActivatedRoute } from '@angular/router';
+import { environment } from '../../../environments/environment';
+import { ContentRangeComponent } from '../content-range/content-range';
+interface ContentItem {
+  id: number;
+  englishWord: string;
+  englishSentence: string;
+}
 @Component({
   selector: 'app-record',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,ContentRangeComponent],
   templateUrl: './record.html',
   styleUrls: ['./record.css']
 })
 export class Record implements OnInit, AfterViewInit {
+  numberOfRecordings=0;
+  contentItems: ContentItem[] = [];
+  currentContentIndex = 0;
   @ViewChild('waveformContainer', { static: false })
   waveformContainer!: ElementRef<HTMLDivElement>;
 
@@ -56,26 +65,66 @@ export class Record implements OnInit, AfterViewInit {
   dialects = ['dongolawi', 'kenzy', 'mahassi'];
   dialect: string | null=null;
 
-  constructor(
+  queryNumber = 0;
+
+  constructor(  private readonly router: Router,
     private http: HttpClient,
     private uploadSrvc: UploadService,
-    private authservice: AuthService
+    private authservice: AuthService,
+    private route: ActivatedRoute
   ) {}
+loadContentItemsFromStorage(): void {
+  const storedItems = localStorage.getItem('contentItems');
 
-  ngOnInit(): void {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      this.fullName = payload.fullName ?? null;
-
-      this.role =localStorage.getItem('role');//  payload.role ?? '';
-      this.isLearner = this.role === 'learner';
-      this.isContributor = true;// this.role === 'contrib' || this.role === 'contributor';
-
-
-      console.log('payload', payload);
-    }
+  if (!storedItems) {
+    return;
   }
+
+  this.contentItems = JSON.parse(storedItems) as ContentItem[];
+  this.currentContentIndex = 0;
+   console.log("CONTENTITEMS ",this.contentItems
+     );
+  this.setCurrentWord();
+}
+onContentLoaded(items: ContentItem[]): void {
+   console.log('CONTENTITEMS from output ', items);
+
+   this.contentItems = items;
+   this.currentContentIndex = 0;
+   this.setCurrentWord();
+ }
+setCurrentWord(): void {
+  const currentItem = this.contentItems[this.currentContentIndex];
+
+  if (!currentItem) {
+    return;
+  }
+
+  this.word = ''
+  this.meaning = currentItem.englishWord;
+}
+ngOnInit(): void {
+
+  this.route.queryParamMap.subscribe(paramMap => {
+    this.queryNumber = +(paramMap.get('number') ?? 0);
+  });
+
+  const token = localStorage.getItem('token');
+
+  if (token) {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+
+    this.fullName = payload.fullName ?? '';
+
+    this.role = localStorage.getItem('role');
+    this.isLearner = this.role === 'learner';
+    this.isContributor = true;
+// window.addEventListener('contentItemsLoaded', () => {
+//     this.loadContentItemsFromStorage();
+//   });
+    console.log('payload', payload);
+  }
+}
 
   ngAfterViewInit(): void {
     this.regionsPlugin = RegionsPlugin.create();
@@ -259,6 +308,13 @@ export class Record implements OnInit, AfterViewInit {
 
         this.regionsPlugin?.clearRegions?.();
         this.waveSurfer?.empty?.();
+        this.currentContentIndex++;
+
+          if (this.currentContentIndex < this.contentItems.length) {
+            this.setCurrentWord();
+          } else {
+            alert('All recordings completed.');
+          }
 
       },
       error: (err: any) => {
@@ -442,7 +498,18 @@ export class Record implements OnInit, AfterViewInit {
     this.nowPlaying = '';
   }
 
+ onNumberChange(event: Event): void {
+   const inputElement = event.target as HTMLInputElement;
 
+   this.numberOfRecordings = +inputElement.value || 0;
+
+   localStorage.setItem(
+     'numberOfRecordings',
+     this.numberOfRecordings.toString()
+   );
+
+   console.log('Current numeric value:', this.numberOfRecordings);
+ }
 
 
 }
