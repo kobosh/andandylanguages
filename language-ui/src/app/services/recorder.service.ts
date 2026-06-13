@@ -33,4 +33,5 @@ export class RecorderService {
       this.mediaRecorder.stop();
     });
   }
+
 }

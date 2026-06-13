@@ -16,7 +16,8 @@ interface ContentItem {
   id: number;
   englishWord: string;
   englishSentence: string;
-}
+  }
+
 @Component({
   selector: 'app-record',
   standalone: true,
@@ -28,6 +29,7 @@ export class Record implements OnInit, AfterViewInit {
   numberOfRecordings=0;
   contentItems: ContentItem[] = [];
   currentContentIndex = 0;
+  uploadSentenceSuccess=false;
   @ViewChild('waveformContainer', { static: false })
   waveformContainer!: ElementRef<HTMLDivElement>;
 
@@ -42,10 +44,10 @@ export class Record implements OnInit, AfterViewInit {
 
   audioUrl: string | null = null;
   text: string = '';
-  meaningText: string = '';
+  meaning: string = '';
 
   word: string | null = null;
-  meaning: string | null = null;
+  //meaning: string | null = null;
 
   nowPlaying: string | null = null;
   uploading = false;
@@ -66,7 +68,7 @@ export class Record implements OnInit, AfterViewInit {
   dialect: string | null=null;
 
   queryNumber = 0;
-
+  uploadedCount=0;
   constructor(  private readonly router: Router,
     private http: HttpClient,
     private uploadSrvc: UploadService,
@@ -95,14 +97,20 @@ onContentLoaded(items: ContentItem[]): void {
  }
 setCurrentWord(): void {
   const currentItem = this.contentItems[this.currentContentIndex];
-
+console.log("yes curntitem", currentItem);
   if (!currentItem) {
+   console.log("NO curntitem", currentItem);
     return;
   }
 
-  this.word = ''
-  this.meaning = currentItem.englishWord;
+  //this.word = ''
+  if(this.isWordMode)
+  {this.meaning =currentItem.englishWord; }
+  else {this.meaning=currentItem.englishSentence;
+
+    this.uploadSentenceSuccess=true;}
 }
+contribId='';
 ngOnInit(): void {
 
   this.route.queryParamMap.subscribe(paramMap => {
@@ -113,15 +121,13 @@ ngOnInit(): void {
 
   if (token) {
     const payload = JSON.parse(atob(token.split('.')[1]));
-
+     this.contribId=payload.sub;
     this.fullName = payload.fullName ?? '';
 
     this.role = localStorage.getItem('role');
     this.isLearner = this.role === 'learner';
     this.isContributor = true;
-// window.addEventListener('contentItemsLoaded', () => {
-//     this.loadContentItemsFromStorage();
-//   });
+
     console.log('payload', payload);
   }
 }
@@ -232,7 +238,7 @@ ngOnInit(): void {
       return;
     }
 
-    if (!this.text || !this.meaningText) {
+    if (!this.text || !this.meaning) {
       alert(this.isWordMode ? 'Enter word + meaning' : 'Enter sentence + sentence meaning');
       return;
     }
@@ -254,7 +260,7 @@ ngOnInit(): void {
         ? this.uploadSrvc.uploadWord(
 
           this.text,
-          this.meaningText,
+          this.meaning,
           compressedBlob,
           filename,
           this.fullName,
@@ -264,7 +270,7 @@ ngOnInit(): void {
       : this.uploadSrvc.uploadSentence(
         this.currentRecordingId!,
         this.text,
-        this.meaningText,
+        this.meaning,
     compressedBlob, filename
 
 
@@ -272,51 +278,68 @@ ngOnInit(): void {
       );
 
     req$.subscribe({
-      next: (resp: any) => {
 
+    next: (resp: any) => {
+      this.uploadedCount++;
+      localStorage.setItem(
+        "uploadedCount",
+        this.uploadedCount.toString()
+      );
+      const wasWordUpload = this.isWordMode;
 
+      if (wasWordUpload) {
+        const id = Number(resp?.id);
 
-        if (this.isWordMode) {
-          const id = Number(resp?.id);
-          if (!id) {
-                       return;
-          }
-
-          this.currentRecordingId = id;
-          this.isWordMode = false;
-
-          // clear fields so user can type sentence next
-          this.text = '';
-          this.meaningText = '';
-        } else {
-          this.isWordMode = true;
-          this.currentRecordingId = null;
-          this.text = '';
-          this.meaningText = '';
+        if (!id) {
+          return;
         }
 
-        this.trimmedBlob = null;
-        this.recordedBlob = null;
-        this.recordedChunks = [];
-        this.hasRegion = false;
-        this.nowPlaying = null;
+        this.currentRecordingId = id;
+        this.isWordMode = false;
 
-        if (this.audioUrl) {
-          URL.revokeObjectURL(this.audioUrl);
-          this.audioUrl = null;
-        }
+        // stay on same item, now ask for Nubian sentence
+        this.setCurrentWord();
 
-        this.regionsPlugin?.clearRegions?.();
-        this.waveSurfer?.empty?.();
+      } else {
+        // sentence upload succeeded, move to next item
+        this.isWordMode = true;
+        this.currentRecordingId = null;
         this.currentContentIndex++;
 
-          if (this.currentContentIndex < this.contentItems.length) {
-            this.setCurrentWord();
-          } else {
-            alert('All recordings completed.');
-          }
+        if (this.currentContentIndex < this.contentItems.length) {
+          this.setCurrentWord();
+        } else {
+          this.text = '';
+          this.meaning = '';
 
-      },
+          this.uploadSrvc.updateProgress(Number( this.contribId),this.uploadedCount)
+          .subscribe({
+              next: () => {
+                console.log('Progress updated successfully');
+                alert('All recordings completed.');
+              },
+              error:( err:any) => {
+                console.error('Progress update failed', err);
+              }
+            });
+          alert('All recordings completed.');
+        }
+      }
+
+      this.trimmedBlob = null;
+      this.recordedBlob = null;
+      this.recordedChunks = [];
+      this.hasRegion = false;
+      this.nowPlaying = null;
+
+      if (this.audioUrl) {
+        URL.revokeObjectURL(this.audioUrl);
+        this.audioUrl = null;
+      }
+
+      this.regionsPlugin?.clearRegions?.();
+      this.waveSurfer?.empty?.();
+    },
       error: (err: any) => {
 
         alert('Upload failed (check console / backend logs).');

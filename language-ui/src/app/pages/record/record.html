@@ -93,8 +93,9 @@
 
         <input
           type="text"
-          [(ngModel)]="meaningText"
-          name="meaningText"
+          [(ngModel)]="meaning
+"
+          name="meaning"
           required
           #meaningModel="ngModel"
           [class.error-input]="meaningModel.invalid && meaningModel.touched"
@@ -143,7 +144,7 @@
       <button
         *ngIf="isContributor"
         class="btn success"
-        [disabled]="!trimmedBlob || uploading || !text || !meaningText"
+        [disabled]="!trimmedBlob || uploading || !text || !meaning"
         (click)="submitAudio()"
       >
         {{ isWordMode ? 'Upload Word' : 'Upload Sentence' }}

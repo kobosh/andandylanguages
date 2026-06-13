@@ -32,9 +32,9 @@ export class ContentRangeComponent implements OnChanges {
 
   dialect = 'MAHASSI';
   itemType = 'WORD';
-  start = 1;
+  start =0;
   end = 10;
-
+  recordingsCount=0;
   items: ContentItem[] = [];
   loading = false;
   errorMessage = '';
@@ -44,26 +44,100 @@ export class ContentRangeComponent implements OnChanges {
     private readonly router: Router
   ) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
+ /* ngOnChanges(changes: SimpleChanges): void {
     console.log('NGONCHANGES FIRED', this.numberOfRecordings);
 
     if (changes['numberOfRecordings'] && this.numberOfRecordings > 0) {
-      this.end = this.start + this.numberOfRecordings;
-      this.loadRange();
-    }
-  }
 
+      this.getNumberOfContributorRecordings(); //make this wait here until function finishes
+      console.log("this.start ",this.start);
+      this.end = this.start + this.numberOfRecordings;
+      console.log("END ",this.end);
+
+    }
+  }*/
+ngOnChanges(changes: SimpleChanges): void {
+  console.log("onchanges this.start ",this.start," end ",this.end);
+  if (changes['numberOfRecordings'] && this.numberOfRecordings > 0) {
+    this.loadNextRange();
+  }
+}
+ /*getNumberOfContributorRecordings() {
+   const token = localStorage.getItem('token');
+
+   if (!token) {
+     return;
+   }
+
+   const payload = JSON.parse(atob(token.split('.')[1]));
+   const contributorId = Number(payload.sub);
+
+   this.http.get<number>(
+     `${environment.contentUrl}/api/content/numberofrecordings`,
+     {
+       params: {
+         contributorId: contributorId
+       }
+     }
+   ).subscribe({
+     next: (count: number) => {
+       this.start = count+1;
+       console.log('START = ', this.start);
+
+     },
+     error: (err: any) => {
+       console.error('Failed to get number of recordings', err);
+     }
+   });
+
+ }*/
+ loadNextRange(): void {
+   const token = localStorage.getItem('token');
+
+   if (!token) {
+     this.errorMessage = 'No token found';
+     return;
+   }
+
+   const payload = JSON.parse(atob(token.split('.')[1]));
+   const contributorId = Number(payload.sub);
+
+   this.http.get<number>(
+     `${environment.contentUrl}/api/content/numberofrecordings`,
+     {
+       params: {
+         contributorId: contributorId
+       }
+     }
+   ).subscribe({
+     next: (recordingsAlreadyDone: number) => {
+       this.start = recordingsAlreadyDone/2 + 1;
+       this.end = this.start + this.numberOfRecordings - 1;
+
+       console.log('Already done = ', recordingsAlreadyDone);
+       console.log('User wants = ', this.numberOfRecordings);
+       console.log('START = ', this.start);
+       console.log('END = ', this.end);
+
+       this.loadRange();
+     },
+     error: (err: any) => {
+       console.error('Failed to get contributor progress', err);
+       this.errorMessage = 'Failed to get contributor progress';
+     }
+   });
+ }
   loadRange(): void {
     this.loading = true;
     this.errorMessage = '';
 
-    const end = this.start + this.numberOfRecordings;
+    //const end = this.start + this.numberOfRecordings;
 
     const params = new HttpParams()
       .set('dialect', this.dialect)
       .set('type', this.itemType)
       .set('start', this.start.toString())
-      .set('end', end.toString());
+      .set('end', this.end.toString());
 
     this.http.get<ContentItem[]>(
       `${environment.contentUrl}/api/content/words`,
@@ -71,7 +145,7 @@ export class ContentRangeComponent implements OnChanges {
     ).subscribe({
       next: (data) => {
         this.items = data;
-        this.end = end;
+       // this.end = end;
 
         localStorage.setItem('contentItems', JSON.stringify(data));
 

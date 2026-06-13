@@ -17,7 +17,21 @@ export interface UploadWordResponse {
 export class UploadService {
   constructor(private http: HttpClient) {
   }
-
+//////////  HOW?WHERE?WHEN?WHAT   triggers this
+// how to finf contribid?
+updateProgress(contribId: number, uploadedCount: number) {
+  console.log("calling update progress ",contribId,"/",uploadedCount)
+  return this.http.post(
+    `${environment.contentUrl}/api/content/progress/update`,
+    null,
+    {
+      params: {
+        contributorId: contribId,
+        uploadedCount: uploadedCount
+      }
+    }
+  );
+}
   uploadWord(
     word: string, meaning: string, blob: Blob, filename: string, author: string, dialect: string | null):
     Observable<UploadWordResponse> {
