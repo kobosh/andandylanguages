@@ -96,6 +96,8 @@ updateProgress(contribId: number, uploadedCount: number) {
         }
       }
     );
+
+
   }
   assess(recordingId: number, mode: 'WORD' | 'SENTENCE', blob: Blob) {
     const formData = new FormData();

@@ -10,6 +10,7 @@ public class ContributorProgress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "CONTRIBUTOR_ID", unique = true, nullable = false)
     private Long contributorId;
 
     private int numberOfRecordings;

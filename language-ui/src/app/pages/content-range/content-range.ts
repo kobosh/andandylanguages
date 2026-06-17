@@ -132,15 +132,15 @@ ngOnChanges(changes: SimpleChanges): void {
     this.errorMessage = '';
 
     //const end = this.start + this.numberOfRecordings;
-
+    console.log('load range START = ', this.start);
+           console.log('load range END = ', this.end);
     const params = new HttpParams()
-      .set('dialect', this.dialect)
-      .set('type', this.itemType)
+
       .set('start', this.start.toString())
       .set('end', this.end.toString());
 
     this.http.get<ContentItem[]>(
-      `${environment.contentUrl}/api/content/words`,
+      `${environment.contentUrl}/api/content/words/range`,
       { params }
     ).subscribe({
       next: (data) => {

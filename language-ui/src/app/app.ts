@@ -1,10 +1,10 @@
 import { Component, signal ,OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {IdleService} from './services/IdleService';
-import {Landing} from './pages/landing/landing'
+//import {Landing} from './pages/landing/landing'
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,Landing],
+  imports: [RouterOutlet],
 
   templateUrl: './app.html',
   styleUrls: ['./app.css']               // ⭐ FIXED ⭐

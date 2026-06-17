@@ -27,6 +27,7 @@ public class ContentController {
         this.ser = s;
         this.wordSentenceCollectionRepository = w;
         this.contribProgressRepository = c;
+
     }
     @PostMapping("/progress/update")
     public void updateProgress(
@@ -36,16 +37,10 @@ public class ContentController {
         System.out.println("callng progress update "+contributorId+" count "+uploadedCount);
         ContributorProgress progress = contribProgressRepository
                 .findByContributorId(contributorId)
-                .orElseGet(() -> {
-                    ContributorProgress p = new ContributorProgress();
+                .orElseGet(() -> {   ContributorProgress p = new ContributorProgress();
                     p.setContributorId(contributorId);
-                    p.setNumberOfRecordings(0);
-                    return p;
-                });
-
-        progress.setNumberOfRecordings(
-                progress.getNumberOfRecordings() + uploadedCount
-        );
+                    p.setNumberOfRecordings(0);     return p;   });
+        progress.setNumberOfRecordings( progress.getNumberOfRecordings() + uploadedCount );
 
         contribProgressRepository.save(progress);
     }
@@ -80,13 +75,19 @@ public class ContentController {
             @RequestParam int start,
             @RequestParam int end
     ) {
-        int size = end - start + 1;
+        int size = end - start ;
 
         return wordSentenceCollectionRepository
-                .findAll(PageRequest.of(start - 1, size))
+                .findAll(PageRequest.of(start , size))
                 .getContent();
     }
-
+    @GetMapping("/words/range")
+    public List<WordSentenceCollection> getWordsRange(
+            @RequestParam Long start,
+            @RequestParam Long end
+    ) {
+        return wordSentenceCollectionRepository.findByIdRange(start, end);
+    }
     @GetMapping("/health")
     public String health() {
         return "Content Service is running";

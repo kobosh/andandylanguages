@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {LoadingSpinnerComponent} from '../../shared/loading-spinner/loading-spinner';
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import { PracticeWord } from '../../model/PracticeWord'
@@ -19,7 +18,7 @@ interface AssessmentResponse {
 @Component({
   selector: 'app-assessment',
 
-  imports: [CommonModule,LoadingSpinnerComponent],
+  imports: [CommonModule],
   templateUrl: './assessment-component.html',
   styleUrls: ['./assessment-component.css']
 })
@@ -41,7 +40,7 @@ export class AssessmentComponent implements AfterViewInit {
   audioUrl: string | null = null;
   nowPlaying: string | null = null;
   hasRegion: boolean | null = null;
-  startrecording=true;
+
   assessmentLoading = false;
   assessmentError = '';
   assessmentResult: AssessmentResponse | null = null;
@@ -49,7 +48,7 @@ export class AssessmentComponent implements AfterViewInit {
   isPreparingTranscript = false;
   expectedWordText = '';
   expectedSentenceText = '';
-
+  startedRecording=true;
 
   wordTranscriptCache: Record<number, string> = {};
   sentenceTranscriptCache: Record<number, string> = {};
@@ -157,7 +156,7 @@ export class AssessmentComponent implements AfterViewInit {
   }
 
   async start() {
-    this.startrecording = true;
+    this.startedRecording = true;
     this.recordingError = '';
     this.recordingDebug = '';
 
@@ -208,7 +207,7 @@ export class AssessmentComponent implements AfterViewInit {
     } catch (err: any) {
       this.recordingError = err?.message || String(err);
 
-      this.startrecording = false;
+      this.startedRecording = false;
     }
   }
 

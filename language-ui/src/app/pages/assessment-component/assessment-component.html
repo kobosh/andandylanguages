@@ -20,7 +20,7 @@
 <!--      Record-->
 <!--    </button>-->
     <button (click)="start()">Record</button>
-    <p *ngIf(startedrecording)> starting record {{startrecording}}</p>
+    <p *ngIf="startedRecording"> starting record {{startedRecording}}</p>
     <button (click)="stop()">Stop</button>
     <button (click)="playOriginal()" [disabled]="!recordedBlob">Play Original</button>
 
@@ -55,12 +55,12 @@
   </div>
   <div *ngIf="assessmentResult" class="assessment-result">
     <h4>Assessment Result</h4>
-    <p><strong>Expected:</strong> {{ assessmentResult?.expectedText }}</p>
+    <p><strong>Expected:</strong> {{ assessmentResult.expectedText }}</p>
 
-    <p><strong>Recognized:</strong> {{ assessmentResult?.recognizedText }}</p>
-    <p><strong>Accuracy:</strong> {{ assessmentResult?.accuracyScore }}</p>
-    <p><strong>Completeness:</strong> {{ assessmentResult?.completenessScore }}</p>
-    <p><strong>Overall:</strong> {{ assessmentResult?.overallScore }}</p>
+    <p><strong>Recognized:</strong> {{ assessmentResult.recognizedText }}</p>
+    <p><strong>Accuracy:</strong> {{ assessmentResult.accuracyScore }}</p>
+    <p><strong>Completeness:</strong> {{ assessmentResult.completenessScore }}</p>
+    <p><strong>Overall:</strong> {{ assessmentResult.overallScore }}</p>
 
     <div *ngIf="assessmentResult.feedback?.length">
       <p><strong>Feedback:</strong></p>

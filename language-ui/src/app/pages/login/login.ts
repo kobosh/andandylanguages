@@ -6,12 +6,12 @@ import { HttpClient } from '@angular/common/http';
 
 import { environment } from '../../../environments/environment';
 import { IdleService} from '../../services/IdleService'
-import { DemoRecordComponent } from '../demo-record/demo-record';
+
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule, DemoRecordComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
