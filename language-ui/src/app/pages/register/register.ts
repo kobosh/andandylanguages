@@ -43,12 +43,17 @@ export class Register implements OnInit{
       this.error = 'Please correct the errors above.';
       return;
     }
+     const loggedInRole = localStorage.getItem('role')?.toUpperCase();
+
+      const newUserRole = loggedInRole === 'ADMIN'
+        ? 'contrib'
+        : 'learner';
 
     this.http.post(`${environment.authUrl}/api/auth/register`, {
       email: this.email,
       password: this.password,
       name: this.name,
-      role: "learner"
+      role: newUserRole
     }).subscribe({
       next: () => {
 
@@ -56,9 +61,8 @@ export class Register implements OnInit{
 
         setTimeout(() => {
 
-            this.router.navigate(['/login'], {
-              queryParams: { role: 'learner' }
-            });
+            this.router.navigate(['/login']
+            );
 
         }, 1500);
       },

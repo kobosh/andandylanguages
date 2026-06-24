@@ -16,16 +16,31 @@
   </p>
 
   <div class="actions">
-<!--    <button (click)="startRecording()">-->
-<!--      Record-->
-<!--    </button>-->
-    <button (click)="start()">Record</button>
-    <p *ngIf="startedRecording"> starting record {{startedRecording}}</p>
-    <button (click)="stop()">Stop</button>
-    <button (click)="playOriginal()" [disabled]="!recordedBlob">Play Original</button>
+    <button type="button" (click)="start()">Record</button>
 
-    <button class="btn secondary" (click)="reset()">Repeat</button>
+    <p *ngIf="startedRecording">
+      starting record {{ startedRecording }}
+    </p>
+
+    <button type="button" (click)="stop()">Stop</button>
+
+    <button type="button" (click)="playOriginal()" [disabled]="!recordedBlob">
+      Play Original
+    </button>
+
+    <button type="button" (click)="trimOnly()" [disabled]="!recordedBlob">
+      Trim Selection
+    </button>
+
+    <button type="button" (click)="playTrimmed()" [disabled]="!trimmedBlob">
+      Play Trimmed
+    </button>
+
+    <button type="button" class="btn secondary" (click)="reset()">
+      Repeat
+    </button>
   </div>
+
   <div class="debug-box">
     <p><strong>Recording debug:</strong></p>
 
@@ -35,28 +50,33 @@
 
     <pre>{{ recordingDebug }}</pre>
   </div>
+
   <div #waveformContainer class="waveform"></div>
 
   <div class="actions">
-
-
-    <button type="button" (click)="assess()" [disabled]="!recordedBlob && !trimmedBlob">
+    <button
+      type="button"
+      (click)="assess()"
+      [disabled]="!recordedBlob && !trimmedBlob">
       Assess My Recording
     </button>
-    <button (click)="back.emit()">Back</button>
+
+    <button type="button" (click)="back.emit()">Back</button>
   </div>
 
   <div *ngIf="assessmentError" class="error">
     {{ assessmentError }}
   </div>
+
   <div *ngIf="assessmentLoading" class="spinner-container">
     <div class="spinner"></div>
     <p>assessing... please wait</p>
   </div>
+
   <div *ngIf="assessmentResult" class="assessment-result">
     <h4>Assessment Result</h4>
-    <p><strong>Expected:</strong> {{ assessmentResult.expectedText }}</p>
 
+    <p><strong>Expected:</strong> {{ assessmentResult.expectedText }}</p>
     <p><strong>Recognized:</strong> {{ assessmentResult.recognizedText }}</p>
     <p><strong>Accuracy:</strong> {{ assessmentResult.accuracyScore }}</p>
     <p><strong>Completeness:</strong> {{ assessmentResult.completenessScore }}</p>
@@ -70,3 +90,73 @@
     </div>
   </div>
 </div>
+<!--<div *ngIf="item" class="card">-->
+<!--  <h3 *ngIf="isWordMode">Practice Recording: Word</h3>-->
+<!--  <h3 *ngIf="!isWordMode">Practice Recording: Sentence</h3>-->
+
+<!--  <p>-->
+<!--    Current item:-->
+<!--    <strong>{{ isWordMode ? item.word : item.sentence }}</strong>-->
+<!--  </p>-->
+
+<!--  <p *ngIf="isWordMode">-->
+<!--    Expected meaning: {{ item.meaning }}-->
+<!--  </p>-->
+
+<!--  <p *ngIf="!isWordMode">-->
+<!--    Expected meaning: {{ item.sentenceMeaning }}-->
+<!--  </p>-->
+
+<!--  <div class="actions">-->
+
+<!--    <button (click)="start()">Record</button>-->
+<!--    <p *ngIf="startedRecording"> starting record {{startedRecording}}</p>-->
+<!--    <button (click)="stop()">Stop</button>-->
+<!--    <button (click)="playOriginal()" [disabled]="!recordedBlob">Play Original</button>-->
+
+<!--    <button class="btn secondary" (click)="reset()">Repeat</button>-->
+<!--  </div>-->
+<!--  <div class="debug-box">-->
+<!--    <p><strong>Recording debug:</strong></p>-->
+
+<!--    <p *ngIf="recordingError" class="error">-->
+<!--      {{ recordingError }}-->
+<!--    </p>-->
+
+<!--    <pre>{{ recordingDebug }}</pre>-->
+<!--  </div>-->
+<!--  <div #waveformContainer class="waveform"></div>-->
+
+<!--  <div class="actions">-->
+
+
+<!--    <button type="button" (click)="assess()" [disabled]="!recordedBlob && !trimmedBlob">-->
+<!--      Assess My Recording-->
+<!--    </button>-->
+<!--    <button (click)="back.emit()">Back</button>-->
+<!--  </div>-->
+
+<!--  <div *ngIf="assessmentError" class="error">-->
+<!--    {{ assessmentError }}-->
+<!--  </div>-->
+<!--  <div *ngIf="assessmentLoading" class="spinner-container">-->
+<!--    <div class="spinner"></div>-->
+<!--    <p>assessing... please wait</p>-->
+<!--  </div>-->
+<!--  <div *ngIf="assessmentResult" class="assessment-result">-->
+<!--    <h4>Assessment Result</h4>-->
+<!--    <p><strong>Expected:</strong> {{ assessmentResult.expectedText }}</p>-->
+
+<!--    <p><strong>Recognized:</strong> {{ assessmentResult.recognizedText }}</p>-->
+<!--    <p><strong>Accuracy:</strong> {{ assessmentResult.accuracyScore }}</p>-->
+<!--    <p><strong>Completeness:</strong> {{ assessmentResult.completenessScore }}</p>-->
+<!--    <p><strong>Overall:</strong> {{ assessmentResult.overallScore }}</p>-->
+
+<!--    <div *ngIf="assessmentResult.feedback?.length">-->
+<!--      <p><strong>Feedback:</strong></p>-->
+<!--      <ul>-->
+<!--        <li *ngFor="let f of assessmentResult.feedback">{{ f }}</li>-->
+<!--      </ul>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->

@@ -1,4 +1,8 @@
-
+<header class="top-bar">
+  <button *ngIf="isLoggedIn()" (click)="logout()">
+    Logout
+  </button>
+</header>
 
 
 <router-outlet>

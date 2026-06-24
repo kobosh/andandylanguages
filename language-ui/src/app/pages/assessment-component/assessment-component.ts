@@ -5,7 +5,6 @@ import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import { PracticeWord } from '../../model/PracticeWord'
 import {environment} from '../../../environments/environment';
-
 interface AssessmentResponse {
   recognizedText: string;
   expectedText: string;   // ✅ ADD THIS
@@ -31,6 +30,7 @@ export class AssessmentComponent implements AfterViewInit {
   waveformContainer!: ElementRef<HTMLDivElement>;
 
   waveSurfer!: WaveSurfer;
+
   regionsPlugin!: any;
 
   recorder: MediaRecorder | null = null;
@@ -135,9 +135,6 @@ export class AssessmentComponent implements AfterViewInit {
   recordingDebug = '';
   recordingError = '';
   //startrecording = false;
-
-
-
   private getSupportedMimeType(): string {
     const types = [
       'audio/webm;codecs=opus',
@@ -295,7 +292,11 @@ export class AssessmentComponent implements AfterViewInit {
       this.assessmentError = 'Please record audio first.';
       return;
     }
-
+  localStorage.setItem(
+              'item',
+              JSON.stringify(this.item)
+            );
+    console.log("FROM LOCAL STORAGE",this.item);
     this.assessmentLoading = true;
     this.assessmentError = '';
     this.assessmentResult = null;
@@ -336,6 +337,7 @@ export class AssessmentComponent implements AfterViewInit {
 
 
         this.transcribeReferenceAudio(blob, this.item!.id);
+
       },
       error: (err) => {
         console.error('Failed to load reference audio', err);
@@ -462,6 +464,7 @@ export class AssessmentComponent implements AfterViewInit {
        // this.recognizedText = result.recognizedText ?? '';
         this.assessmentLoading = false;
         this.clearWaveform();
+       // this.learnerProgress.set(this.this.assessmentResult);///////////////////////////////
       },
       error: (err) => {
         console.error('Assessment failed', err);
@@ -496,4 +499,86 @@ export class AssessmentComponent implements AfterViewInit {
 
 
   }
+async trimOnly() {
+    if (!this.recordedBlob) {
+      alert('Nothing to trim');
+      return;
+    }
+
+    const regions = Object.values(this.regionsPlugin.getRegions());
+    if (regions.length === 0) {
+      alert('Please select a region on the waveform');
+      return;
+    }
+
+    const { start, end }: any = regions[0];
+
+    const ctx = new AudioContext();
+    const buffer = await ctx.decodeAudioData(await this.recordedBlob.arrayBuffer());
+
+    const startSample = Math.floor(start * buffer.sampleRate);
+    const endSample = Math.floor(end * buffer.sampleRate);
+
+    const trimmed = ctx.createBuffer(
+      buffer.numberOfChannels,
+      endSample - startSample,
+      buffer.sampleRate
+    );
+
+    for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+      trimmed
+        .getChannelData(ch)
+        .set(buffer.getChannelData(ch).slice(startSample, endSample));
+    }
+
+    this.trimmedBlob = this.encodeWav(trimmed);
+
+    if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
+    this.audioUrl = URL.createObjectURL(this.trimmedBlob);
+
+    this.regionsPlugin.clearRegions();
+    this.waveSurfer.load(this.audioUrl);
+
+    this.hasRegion = false;
+    this.nowPlaying = 'Trimmed';
+  }
+
+  encodeWav(buffer: AudioBuffer): Blob {
+    const samples = buffer.getChannelData(0);
+    const ab = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(ab);
+
+    let o = 0;
+    const w = (s: string) => [...s].forEach((c) => view.setUint8(o++, c.charCodeAt(0)));
+
+    w('RIFF');
+    view.setUint32(o, 36 + samples.length * 2, true);
+    o += 4;
+    w('WAVEfmt ');
+    view.setUint32(o, 16, true);
+    o += 4;
+    view.setUint16(o, 1, true);
+    o += 2;
+    view.setUint16(o, 1, true);
+    o += 2;
+    view.setUint32(o, buffer.sampleRate, true);
+    o += 4;
+    view.setUint32(o, buffer.sampleRate * 2, true);
+    o += 4;
+    view.setUint16(o, 2, true);
+    o += 2;
+    view.setUint16(o, 16, true);
+    o += 2;
+    w('data');
+    view.setUint32(o, samples.length * 2, true);
+    o += 4;
+
+    samples.forEach((s) => {
+      view.setInt16(o, s * 0x7fff, true);
+      o += 2;
+    });
+
+    return new Blob([view], { type: 'audio/wav' });
+  }
+  learnerProgress=new Map<string,number>();
 }

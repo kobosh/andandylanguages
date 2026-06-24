@@ -25,7 +25,6 @@ export class Login implements OnInit {
 
   errorMessage = '';
   forgotPasswordMessage = '';
-  //private resetPassword: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -44,39 +43,65 @@ export class Login implements OnInit {
     this.idleService.stopWatching();
   }
 
-  login(): void {
-    this.errorMessage = '';
 
-    this.http.post<any>(`${environment.authUrl}/api/auth/login`, {
-      email: this.email,
-      password: this.password
-    }).subscribe({
-      next: (resp) => {
-        localStorage.setItem('token', resp.accessToken);
-        localStorage.setItem('role', resp.role);
-        localStorage.setItem("email",resp.email);
 
-        if (resp.mustChangePassword) {
-          this.router.navigate(['/change-password']);
-          return;
-        }
 
-        this.idleService.startWatching();
+       login(): void {
+           this.errorMessage = '';
 
-        if (resp.role === 'contrib' || resp.role === 'CONTRIB' || resp.role === 'CONTRIBUTOR') {
-          this.router.navigate(['/record']);
-        } else if (resp.role === 'learner' || resp.role === 'LEARNER') {
-          this.router.navigate(['/demorecord']);
-        } else {
-          this.router.navigate(['/login']);
-        }
-      },
-      error: (err) => {
-        console.log('LOGIN ERROR', err);
-        this.errorMessage = `Login failed. Status=${err.status}`;
-      }
-    });
-  }
+           this.http.post<any>(`${environment.authUrl}/api/auth/login`, {
+             email: this.email,
+             password: this.password
+           }).subscribe(
+             {
+             next: (resp) => {
+               localStorage.setItem('token', resp.accessToken);
+               localStorage.setItem('role', resp.role);
+               localStorage.setItem("email",resp.email);
+
+               if (resp.mustChangePassword)
+                {
+                 this.router.navigate(['/change-password']);
+                 return;
+               }
+
+              this.idleService.startWatching();
+
+              const role = (resp.role || '').toUpperCase();
+
+              if (role === 'ADMIN') {
+                console.log('BEFORE REGISTER NAVIGATION');
+                this.router.navigate(['/register'],{ queryParams: { role: 'admin' }});
+
+              } else if (role === 'LEARNER') {
+                this.router.navigate(
+                  ['/demo-record'],
+                  { queryParams: { role: 'learner' } }
+                );
+
+              } else if (
+                role === 'CONTRIB' ||
+                role === 'CONTRIBUTOR'
+              ) {
+                this.router.navigate(
+                  ['/demo-record'],
+                  { queryParams: { role: 'contrib' } }
+                );
+
+              } else {
+                console.error('Unknown role:', resp.role);
+                this.router.navigate(['/login']);
+              }
+              },
+             error: (err) => {
+               console.log('LOGIN ERROR', err);
+               this.errorMessage = `Login failed. Status=${err.status}`;
+             }
+           });
+         }
+
+
+
 
   forgotPassword(): void {
     this.errorMessage = '';

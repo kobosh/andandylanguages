@@ -71,8 +71,44 @@ export class DemoRecordComponent implements AfterViewInit,OnInit {
       });
     });
   }
+async startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-  async startRecording() {
+    this.recordedChunks = [];
+    this.recordedBlob = null;
+    this.trimmedBlob = null;
+
+    this.recorder = new MediaRecorder(stream);
+
+    this.recorder.ondataavailable = e => {
+      if (e.data.size > 0) {
+        this.recordedChunks.push(e.data);
+      }
+    };
+
+    this.recorder.onstop = () => {
+      this.recordedBlob = new Blob(this.recordedChunks, {
+        type: this.recorder?.mimeType || 'audio/mp4'
+      });
+
+      console.log('DEMO RECORDED BLOB', this.recordedBlob);
+
+      this.waveSurfer.loadBlob(this.recordedBlob);
+
+      this.canPlayOriginal = true;
+      this.canPlayTrimmed = false;
+    };
+
+    this.recorder.start();
+    this.isRecording = true;
+
+  } catch (err) {
+    console.error('Microphone recording failed', err);
+    alert('Recording failed. Check microphone permission.');
+  }
+}
+ /* async startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
     this.recordedChunks = [];
@@ -91,7 +127,7 @@ export class DemoRecordComponent implements AfterViewInit,OnInit {
 
     this.recorder.start();
     this.isRecording = true;
-  }
+  }*/
   resetDemo() {
 
     this.waveSurfer.stop();
@@ -116,20 +152,99 @@ export class DemoRecordComponent implements AfterViewInit,OnInit {
       this.waveSurfer.play();
     });
   }
+stopRecording() {
+  if (!this.recorder || this.recorder.state !== 'recording') {
+    return;
+  }
 
+  this.recorder.stop();
+  this.recorder.stream.getTracks().forEach(track => track.stop());
 
-  stopRecording() {
+  this.isRecording = false;
+}
+
+ /* stopRecording() {
     this.recorder?.stop();
     this.isRecording = false;
-  }
+  }*/
   playOriginal() {
     if (!this.recordedBlob) return;
 
     this.waveSurfer.loadBlob(this.recordedBlob);
     this.waveSurfer.play();
   }
+ async trim() {
+   const regions = Object.values(this.regions.getRegions()) as any[];
 
-  async trim() {
+   if (!regions.length || !this.recordedBlob) {
+     alert('Select a region by clicking and dragging on the waveform');
+     return;
+   }
+
+   const { start, end } = regions[0];
+
+   const ctx = new AudioContext();
+   const buffer = await ctx.decodeAudioData(await this.recordedBlob.arrayBuffer());
+
+   const startSample = Math.floor(start * buffer.sampleRate);
+   const endSample = Math.floor(end * buffer.sampleRate);
+
+   const trimmed = ctx.createBuffer(
+     buffer.numberOfChannels,
+     endSample - startSample,
+     buffer.sampleRate
+   );
+
+   for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+     trimmed
+       .getChannelData(ch)
+       .set(buffer.getChannelData(ch).slice(startSample, endSample));
+   }
+
+   this.trimmedBlob = this.encodeWav(trimmed);
+
+   this.waveSurfer.loadBlob(this.trimmedBlob);
+
+   this.canPlayTrimmed = true;
+ }
+  encodeWav(buffer: AudioBuffer): Blob {
+    const samples = buffer.getChannelData(0);
+    const ab = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(ab);
+
+    let o = 0;
+    const w = (s: string) => [...s].forEach((c) => view.setUint8(o++, c.charCodeAt(0)));
+
+    w('RIFF');
+    view.setUint32(o, 36 + samples.length * 2, true);
+    o += 4;
+    w('WAVEfmt ');
+    view.setUint32(o, 16, true);
+    o += 4;
+    view.setUint16(o, 1, true);
+    o += 2;
+    view.setUint16(o, 1, true);
+    o += 2;
+    view.setUint32(o, buffer.sampleRate, true);
+    o += 4;
+    view.setUint32(o, buffer.sampleRate * 2, true);
+    o += 4;
+    view.setUint16(o, 2, true);
+    o += 2;
+    view.setUint16(o, 16, true);
+    o += 2;
+    w('data');
+    view.setUint32(o, samples.length * 2, true);
+    o += 4;
+
+    samples.forEach((s) => {
+      view.setInt16(o, s * 0x7fff, true);
+      o += 2;
+    });
+
+    return new Blob([view], { type: 'audio/wav' });
+  }
+ /* async trim() {
     const regions = Object.values(this.regions.getRegions());
 
     if (!regions.length || !this.recordedBlob) {
@@ -173,5 +288,5 @@ export class DemoRecordComponent implements AfterViewInit,OnInit {
 
     mediaRecorder.start();
     setTimeout(() => mediaRecorder.stop(), (end - start) * 1000);
-  }
+  }*/
 }

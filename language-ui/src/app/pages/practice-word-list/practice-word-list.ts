@@ -7,7 +7,7 @@ import {PracticeWordSentence} from '../practice-word-sentence/practice-word-sent
 import { AssessmentComponent } from '../assessment-component/assessment-component';
 import {environment} from '../../../environments/environment';
 
-export interface PracticeWord {
+export interface PracticeWordAndSentence {
   id: number;
   word: string;
   meaning: string;
@@ -27,9 +27,9 @@ export interface PracticeWord {
   styleUrls: ['./practice-word-list.css']
 })
 export class PracticeWordListComponent implements OnInit {
-  practiceWords: PracticeWord[] = [];
+  practiceWords: PracticeWordAndSentence[] = [];
   currentIndex = 0;
-  selectedWord: PracticeWord | null = null;
+  selectedWord: PracticeWordAndSentence | null = null;
 
   viewMode: 'practice' | 'assess' = 'practice';
   isWordMode = true;
@@ -73,7 +73,7 @@ export class PracticeWordListComponent implements OnInit {
       return;
     }
     this.isUploading=true;
-    this.http.get<PracticeWord[]>(`${environment.audioUrl}/api/recordings/practice-words?dialect=${this.dialect}`,
+    this.http.get<PracticeWordAndSentence[]>(`${environment.audioUrl}/api/recordings/practice-words?dialect=${this.dialect}`,
       {
         headers:{
           Authorization: `Bearer ${token}`
@@ -100,13 +100,13 @@ export class PracticeWordListComponent implements OnInit {
       });
   }
 
-  get currentItem(): PracticeWord | null {
+  get currentItem(): PracticeWordAndSentence | null {
     if(this.isUploading) return  null;
     if (!this.practiceWords.length) return null;
     return this.practiceWords[this.currentIndex];
   }
 
-  selectWord(item: PracticeWord): void {
+  selectWord(item: PracticeWordAndSentence): void {
     this.selectedWord = item;
     this.error = '';
     this.showRecorder = false;

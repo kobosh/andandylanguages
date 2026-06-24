@@ -1,6 +1,6 @@
 {
   "/auth-api": {
-  "target": "http://10.0.0.29:8082",
+  "target": "http://localhost:8082",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
@@ -9,7 +9,7 @@
 },
 
   "/audio-api": {
-  "target": "http://10.0.0.29:8083",
+  "target": "http://localhost:8083",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
@@ -18,7 +18,7 @@
 },
 
   "/pronunciation-api": {
-  "target": "http://10.0.0.29:8084",
+  "target": "http://localhost:8084",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
@@ -26,14 +26,12 @@
   }
 },
   "/content-api": {
-    "target": "http://10.0.0.29:8085",
+    "target": "http://localhost:8085",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
       "^/content-api": ""
     }
-  },
-  "server": {
-    "allowedHosts": ["squid-striving-vantage.ngrok-free.dev"]
   }
-}
+  }
+

@@ -39,7 +39,7 @@ export class ChangePassword {
     }
 console.log("sending password  and email",this.newPassword,this.email)
     this.http.post(
-      `${environment.authUrl}/api/auth/reset-password`,
+      `${environment.authUrl}/api/auth/change-password`,
       {
         email: localStorage.getItem("email"),
         oldPassword: this.oldPassword,

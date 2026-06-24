@@ -38,10 +38,10 @@ export class ResetPassword  implements OnInit{
     console.log('NEW PASSWORD=', this.newPassword);
 
     this.http.post(
-      `${environment.authUrl}/api/auth/forgot-password`,
+      `${environment.authUrl}/api/auth/reset-password`,
       {
         token: this.token,
-        password: this.newPassword,
+        newPassword: this.newPassword,
         email: this.email
       },
       { responseType: 'text' }

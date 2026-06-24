@@ -14,6 +14,7 @@ import {environment} from '../../../environments/environment';
 })
 export class PracticeWordSentence {
   @Input() item: PracticeWord | null = null;
+
   @Input() currentIndex = 0;
   @Input() totalItems = 0;
   @Input() isWordMode = true;
@@ -37,11 +38,13 @@ export class PracticeWordSentence {
 
   playWord(): void {
     if (!this.item) return;
+
     this.playAudio('word', this.item.wordAudioUrl);
   }
 
   playSentence(): void {
     if (!this.item) return;
+
     this.playAudio('sentence', this.item.sentenceAudioUrl);
   }
 
@@ -113,7 +116,7 @@ export class PracticeWordSentence {
       this.currentAudio = null;
     }
   }
-async trimOnly() {
+/*async trimOnly() {
     if (!this.recordedBlob) {
       alert('Nothing to trim');
       return;
@@ -193,6 +196,6 @@ encodeWav(buffer: AudioBuffer): Blob {
     });
 
     return new Blob([view], { type: 'audio/wav' });
-  }
+  }*/
 
 }
