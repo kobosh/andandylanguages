@@ -37,7 +37,7 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/forgot-password",
                                 "/api/auth/change-password",
-
+                                "/api/auth/reset-password",
                                 "/.well-known/jwks.json",
                                 "/h2-console/**"
                         ).permitAll()

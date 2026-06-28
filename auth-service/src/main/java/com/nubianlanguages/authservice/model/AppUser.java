@@ -55,5 +55,6 @@ public class AppUser {
         this.password = password;
         this.role = role;
     }
-
+     public String toString()
+     {   return  this.email+"/"+this.fullname+" "+this.password;}
 }

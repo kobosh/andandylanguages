@@ -37,7 +37,7 @@ export class PracticeWordListComponent implements OnInit {
 
   fullName = '';
   error = '';
-
+numberOfRecordings: number | null = null;
 
   dialect: string | null = null;
 
@@ -60,8 +60,21 @@ export class PracticeWordListComponent implements OnInit {
 
     if (this.dialect) {
       this.loadPracticeWords();
+      localStorage.setItem("selectedDialect",this.dialect)
     }
   }
+ onNumberChange(event: Event): void {
+   const inputElement = event.target as HTMLInputElement;
+
+   this.numberOfRecordings = +  inputElement.value || 0;
+
+   localStorage.setItem(
+     'numberOfRecordings',
+     this.numberOfRecordings.toString()
+   );
+
+   console.log('Current numeric value:', this.numberOfRecordings);
+ }
   loadPracticeWords(): void {
     console.log("calling loadpracticewords"+this.dialect);
 

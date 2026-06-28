@@ -1,0 +1,53 @@
+<section class="card">
+
+  <h2>Admin - Add Contributor</h2>
+
+  <form (ngSubmit)="addContributor()">
+
+    <div>
+      <label>Full Name</label>
+      <input
+        type="text"
+        [(ngModel)]="fullName"
+        name="fullName"
+        required>
+    </div>
+
+    <div>
+      <label>Email</label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        required>
+    </div>
+
+    <div>
+      <label>Temporary Password</label>
+      <input
+        type="password"
+        [(ngModel)]="temporaryPassword"
+        name="temporaryPassword"
+        required>
+    </div>
+
+    <input
+      type="hidden"
+      [(ngModel)]="role"
+      name="role">
+
+    <button type="submit">
+      Add Contributor
+    </button>
+
+  </form>
+
+  <p *ngIf="successMessage" class="success">
+    {{ successMessage }}
+  </p>
+
+  <p *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </p>
+
+</section>

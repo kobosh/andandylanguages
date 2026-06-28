@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit,OnInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import WaveSurfer from 'wavesurfer.js';
@@ -12,6 +12,7 @@ interface AssessmentResponse {
   completenessScore: number;
   overallScore: number;
   feedback?: string[];
+  //email:string;
 }
 
 @Component({
@@ -21,7 +22,7 @@ interface AssessmentResponse {
   templateUrl: './assessment-component.html',
   styleUrls: ['./assessment-component.css']
 })
-export class AssessmentComponent implements AfterViewInit {
+export class AssessmentComponent implements OnInit, AfterViewInit {
   @Input() item: PracticeWord | null = null;
   @Input() isWordMode = true;
   @Output() back = new EventEmitter<void>();
@@ -44,7 +45,8 @@ export class AssessmentComponent implements AfterViewInit {
   assessmentLoading = false;
   assessmentError = '';
   assessmentResult: AssessmentResponse | null = null;
-
+email='';
+selectedDialect='';
   isPreparingTranscript = false;
   expectedWordText = '';
   expectedSentenceText = '';
@@ -53,10 +55,31 @@ export class AssessmentComponent implements AfterViewInit {
   wordTranscriptCache: Record<number, string> = {};
   sentenceTranscriptCache: Record<number, string> = {};
   constructor( private  http: HttpClient) {}
-
+ngOnInit()
+{ this.email=localStorage.getItem("email")??'';
+  this.selectedDialect= localStorage.getItem("selectedDialect")??'';
+  }
   ngAfterViewInit(): void {
     this.initWaveSurfer();
+
   }
+wordPassed = false;
+sentencePassed = false;
+incrementLearnerProgress() {
+  this.http.post(
+    `${environment.contentUrl}/learner-progress/increment`,
+    null,
+    {
+      params: {
+        email: this.email,
+        dialect: this.selectedDialect
+      }
+    }
+  ).subscribe({
+    next: resp => console.log('Learner progress updated', resp),
+    error: err => console.error('Learner progress error', err)
+  });
+}
   reset(): void {
     // stop recording if still active
     if (this.recorder && this.recorder.state === 'recording') {
@@ -304,14 +327,7 @@ export class AssessmentComponent implements AfterViewInit {
     this.fetchReferenceAudioBlobAndTranscribe();
 
   }
-
-
-
-
-
-
-
-  private fetchReferenceAudioBlobAndTranscribe(): void {
+private fetchReferenceAudioBlobAndTranscribe(): void {
     if (!this.item) {
       this.assessmentError = 'No practice item selected.';
       return;
@@ -424,6 +440,7 @@ export class AssessmentComponent implements AfterViewInit {
       }
     });
   }
+
   private submitAssessment(expectedText: string): void {
     if (!this.item) {
       this.assessmentError = 'No practice item selected.';
@@ -457,13 +474,30 @@ export class AssessmentComponent implements AfterViewInit {
         }
         : {}
     ).subscribe({
+
       next: (result) => {
+
         console.log("expectedtext ",result);
 
         this.assessmentResult = result;
        // this.recognizedText = result.recognizedText ?? '';
         this.assessmentLoading = false;
         this.clearWaveform();
+        if (this.isWordMode && result.overallScore >= 60) {
+          localStorage.setItem("wordPassed","true") ;//this.wordPassed = true;
+        }
+      if (!this.isWordMode && result.overallScore >= 60) {
+        localStorage.setItem("sentencePassed","true");
+      }
+    if (localStorage.getItem("wordPassed")=="true" && localStorage.getItem("sentencePassed")=="true") {
+      this.incrementLearnerProgress();
+     localStorage.setItem("wordPassed","false");
+     localStorage.setItem("sentencePassed","false");
+
+
+    }
+
+
        // this.learnerProgress.set(this.this.assessmentResult);///////////////////////////////
       },
       error: (err) => {

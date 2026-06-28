@@ -63,5 +63,10 @@ export const routes: Routes = [
       .then(m=>m.DemoRecordComponent)},
   {path: 'practice',
     loadComponent:()=>import('./pages/practice-word-list/practice-word-list')
-      .then(m=>m.PracticeWordListComponent)}
+      .then(m=>m.PracticeWordListComponent)},
+       {
+         path: 'admin',
+          loadComponent:()=>import('./pages/admin/admin')
+            .then(m=>m.AdminComponent)
+              }
 ];

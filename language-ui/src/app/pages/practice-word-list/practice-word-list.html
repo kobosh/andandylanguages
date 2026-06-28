@@ -2,17 +2,30 @@
 <div>
   <p> Here you can <strong> Practice</strong> speaking  </p>
   <p> <strong>This is experimental! Do not be upset if you get low score on assessment</strong> </p>
+  <p> Learn one Dialect first: Dongolawi and Kenzi are almost the same   </p>
+  <p> In each session you will learn 3 words  and usage. You learn in order of most frequent used.
+    So do not skip.
+    Note word may be repeated by several native speakers. You are allowed to advance to next word if you
+    do not like to repeat same word over again.
+    </p>
+  <p>
+
+  </p>take your time to practice. Then record the word/sentemce amd play it to see if you said it correct.
+
 </div>
 <div>
   <p>
-    Select dialect you want to learn: Dongolawi,Mahassi or Kenzi
+    Select dialect : Dongolawi  (upper Nubian)   ,Mahassi (middle) or Kenzi ( Egypt Swan)
   </p>
 </div>
+
+
 <div *ngIf="isUploading" class="spinner-container">
   <div class="spinner"></div>
   <p>uploading words... please wait</p>
 </div>
 <div class="form-field">
+
   <label>Dialect</label>
 
   <select [(ngModel)]="dialect" name="dialect" (change)="onDialectChange()" >
@@ -20,7 +33,11 @@
     <option *ngFor="let d of dialects" [value]="d">{{ d }}</option>
   </select>
 <p *ngIf="error">{{error}}</p>
+
+
 </div>
+
+
 
 <div *ngIf="viewMode === 'practice'">
 

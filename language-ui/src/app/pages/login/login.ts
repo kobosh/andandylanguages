@@ -71,7 +71,7 @@ export class Login implements OnInit {
 
               if (role === 'ADMIN') {
                 console.log('BEFORE REGISTER NAVIGATION');
-                this.router.navigate(['/register'],{ queryParams: { role: 'admin' }});
+                this.router.navigate(['/admin'],{ queryParams: { role: 'admin' }});
 
               } else if (role === 'LEARNER') {
                 this.router.navigate(

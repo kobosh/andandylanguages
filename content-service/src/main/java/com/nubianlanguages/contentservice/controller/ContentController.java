@@ -5,15 +5,17 @@ package com.nubianlanguages.contentservice.controller;
 
 import com.nubianlanguages.contentservice.dto.WordSentenceRequest;
 import com.nubianlanguages.contentservice.entity.ContributorProgress;
-import com.nubianlanguages.contentservice.entity.ItemType;
 import com.nubianlanguages.contentservice.entity.WordSentenceCollection;
 import com.nubianlanguages.contentservice.repository.ContributorProgressRepository;
 import com.nubianlanguages.contentservice.repository.WordSentenceCollectionRepository;
 import com.nubianlanguages.contentservice.service.ContentService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import com.nubianlanguages.contentservice.entity.LearnerProgress;
+import  com.nubianlanguages.contentservice.repository.LearnerProgressRepository;
 
 @RestController
 @RequestMapping("/api/content")
@@ -21,13 +23,14 @@ public class ContentController {
     private ContentService ser;
     private final WordSentenceCollectionRepository wordSentenceCollectionRepository;
     private final ContributorProgressRepository contribProgressRepository;
-
+    private  final LearnerProgressRepository learnerProgressRepository;
     public ContentController(ContentService s, WordSentenceCollectionRepository w,
-                             ContributorProgressRepository c) {
+                             ContributorProgressRepository c, LearnerProgressRepository learnerProgressRepository) {
         this.ser = s;
         this.wordSentenceCollectionRepository = w;
         this.contribProgressRepository = c;
 
+        this.learnerProgressRepository = learnerProgressRepository;
     }
     @PostMapping("/progress/update")
     public void updateProgress(
@@ -88,6 +91,43 @@ public class ContentController {
     ) {
         return wordSentenceCollectionRepository.findByIdRange(start, end);
     }
+    @GetMapping("/learner-progress")
+    public LearnerProgress getProgress(
+            @RequestParam String email,
+            @RequestParam String dialect) {
+
+        return learnerProgressRepository
+                .findByLearnerEmailAndDialect(email, dialect)
+                .orElseGet(() -> {
+                    LearnerProgress progress = new LearnerProgress();
+                    progress.setLearnerEmail(email);
+                    progress.setDialect(dialect);
+                    progress.setCompletedCount(0);
+                    progress.setUpdatedAt(LocalDateTime.now());
+                    return learnerProgressRepository.save(progress);
+                });
+    }
+    @PostMapping("/learner-progress/increment")
+    public LearnerProgress incrementProgress(
+            @RequestParam String email,
+            @RequestParam String dialect) {
+
+        LearnerProgress progress = learnerProgressRepository
+                .findByLearnerEmailAndDialect(email, dialect)
+                .orElseGet(() -> {
+                    LearnerProgress p = new LearnerProgress();
+                    p.setLearnerEmail(email);
+                    p.setDialect(dialect);
+                    p.setCompletedCount(0);
+                    return p;
+                });
+
+        progress.setCompletedCount(progress.getCompletedCount() + 1);
+        progress.setUpdatedAt(LocalDateTime.now());
+
+        return learnerProgressRepository.save(progress);
+    }
+
     @GetMapping("/health")
     public String health() {
         return "Content Service is running";
